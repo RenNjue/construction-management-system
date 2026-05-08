@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Platinum Construction Management</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: #f0f2f5; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        .top-navbar {
+            background: linear-gradient(135deg, #0d6efd, #1d4ed8, #0f172a);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1030;
+            padding: 8px 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .navbar-brand { color: white; font-weight: bold; font-size: 1.3rem; }
+        .user-menu { cursor: pointer; color: white; }
+        .sidebar {
+            position: fixed;
+            top: 56px;
+            left: 0;
+            bottom: 0;
+            width: 260px;
+            background: linear-gradient(135deg, #0d6efd, #1d4ed8, #0f172a);
+            color: white;
+            overflow-y: auto;
+            z-index: 1020;
+        }
+        .sidebar .nav-section { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; padding: 15px 20px 5px; opacity: 0.6; }
+        .sidebar a { color: white; text-decoration: none; padding: 10px 20px; display: block; transition: 0.3s; cursor: pointer; }
+        .sidebar a:hover { background: rgba(255,255,255,0.1); border-radius: 8px; margin: 0 10px; }
+        .sidebar i { width: 24px; margin-right: 10px; }
+        .main-content { margin-left: 260px; margin-top: 56px; padding: 20px; }
+        .footer { margin-left: 260px; padding: 15px 20px; background: white; border-top: 1px solid #dee2e6; font-size: 12px; color: #6c757d; text-align: center; }
+        .stat-card { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); margin-bottom: 20px; transition: transform 0.2s; cursor: pointer; }
+        .stat-card:hover { transform: translateY(-3px); }
+        .login-container { max-width: 450px; margin: 100px auto; background: white; border-radius: 16px; padding: 30px; box-shadow: 0 10px 40px rgba(0,0,0,0.1); }
+        .filter-bar { background: white; padding: 20px; border-radius: 12px; margin-bottom: 20px; }
+        .table-responsive { max-height: 500px; overflow: auto; }
+        .remember-me { display: flex; align-items: center; gap: 8px; margin-top: 10px; }
+        .btn-sm { margin: 2px; }
+        .modal-content { border-radius: 12px; }
+        @media (max-width: 768px) { .sidebar { width: 70px; } .sidebar span { display: none; } .main-content, .footer { margin-left: 70px; } }
+    </style>
+</head>
+<body>
+
+<!-- Top Navbar -->
+<div class="top-navbar">
+    <div class="d-flex justify-content-between align-items-center">
+        <div class="navbar-brand"><i class="fas fa-hard-hat"></i> Platinum Construction</div>
+        <div class="dropdown">
+            <div class="user-menu d-flex align-items-center" data-bs-toggle="dropdown">
+                <i class="fas fa-user-circle fa-2x me-2"></i>
+                <span id="userName">Account</span>
+                <i class="fas fa-chevron-down ms-2 small"></i>
+            </div>
+            <ul class="dropdown-menu dropdown-menu-end">
+                <li><a class="dropdown-item" href="#" onclick="showProfile()"><i class="fas fa-user me-2"></i>Profile</a></li>
+                <li><a class="dropdown-item" href="#" onclick="showChangePassword()"><i class="fas fa-key me-2"></i>Change Password</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item" href="#" onclick="showSettings()"><i class="fas fa-cog me-2"></i>Settings</a></li>
+                <li><a class="dropdown-item" href="#" onclick="showAbout()"><i class="fas fa-info-circle me-2"></i>About</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item text-danger" href="#" onclick="logout()"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<!-- Sidebar -->
+<div class="sidebar">
+    <div class="text-center p-3"><i class="fas fa-hard-hat fa-2x"></i></div>
+    <div class="nav-section">Main Menu</div>
+    <a onclick="showPage('dashboard')"><i class="fas fa-tachometer-alt"></i> <span>Dashboard</span></a>
+    <div class="nav-section">Construction</div>
+    <a onclick="showPage('sites')"><i class="fas fa-map-marker-alt"></i> <span>Sites</span></a>
+    <a onclick="showPage('materialCategories')"><i class="fas fa-tags"></i> <span>Material Categories</span></a>
+    <a onclick="showPage('expenseCategories')"><i class="fas fa-receipt"></i> <span>Expense Categories</span></a>
+    <a onclick="showPage('materials')"><i class="fas fa-cubes"></i> <span>Materials</span></a>
+    <a onclick="showPage('expenses')"><i class="fas fa-money-bill-wave"></i> <span>Expenses</span></a>
+    <a onclick="showPage('inventory')"><i class="fas fa-boxes"></i> <span>Inventory</span></a>
+    <div class="nav-section">Employees</div>
+    <a onclick="showPage('employees')"><i class="fas fa-users"></i> <span>Employees</span></a>
+    <a onclick="showPage('attendance')"><i class="fas fa-calendar-check"></i> <span>Attendance</span></a>
+    <a onclick="showPage('pendingPayments')"><i class="fas fa-money-bill-wave"></i> <span>Pending Payments</span></a>
+    <div class="nav-section">Reports</div>
+    <a onclick="showPage('reports')"><i class="fas fa-chart-line"></i> <span>Reports Dashboard</span></a>
+</div>
+
+<!-- Main Content -->
+<div class="main-content" id="mainContent" style="display: none;">
+    <div id="pageContent"><div class="text-center py-5"><div class="spinner-border text-primary"></div><p>Loading...</p></div></div>
+</div>
+
+<!-- Footer -->
+<div class="footer" id="footer" style="display: none;">
+    <p class="mb-0">&copy; 2025 AVC Tech. All rights reserved. | <a href="#" onclick="showPrivacy()">Privacy Policy</a> | <a href="#" onclick="showTerms()">Terms of Service</a><br>
+    Contact: starjabu@gmail.com | +254 717 141 710</p>
+</div>
+
+<!-- Login Screen -->
+<div id="loginScreen" class="login-container">
+    <div class="text-center mb-4">
+        <i class="fas fa-hard-hat fa-4x text-primary"></i>
+        <h2 class="mt-3">Platinum Construction</h2>
+        <p class="text-muted">Construction Management System</p>
+    </div>
+    <ul class="nav nav-tabs mb-3" id="loginTab" role="tablist">
+        <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#loginTabContent">Login</button></li>
+        <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#registerTabContent">Register (7-day trial)</button></li>
+    </ul>
+    <div class="tab-content">
+        <div class="tab-pane active" id="loginTabContent">
+            <div class="mb-3"><label class="form-label">Email</label><input type="email" id="loginEmail" class="form-control"></div>
+            <div class="mb-3"><label class="form-label">Password</label><input type="password" id="loginPassword" class="form-control"></div>
+            <div class="remember-me"><input type="checkbox" id="rememberMeCheckbox"><label for="rememberMeCheckbox">Remember me</label></div>
+            <button class="btn btn-primary w-100 mt-3" onclick="doLogin()">Login</button>
+        </div>
+        <div class="tab-pane" id="registerTabContent">
+            <div class="mb-3"><label class="form-label">Full Name</label><input type="text" id="regName" class="form-control"></div>
+            <div class="mb-3"><label class="form-label">Email</label><input type="email" id="regEmail" class="form-control"></div>
+            <div class="mb-3"><label class="form-label">Password</label><input type="password" id="regPassword" class="form-control"></div>
+            <div class="mb-3"><label class="form-label">Confirm Password</label><input type="password" id="regConfirmPassword" class="form-control"></div>
+            <button class="btn btn-success w-100" onclick="doRegister()">Start 7-Day Free Trial</button>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+// ============= SUPABASE CONFIGURATION =============
+const SUPABASE_URL = 'https://qbgspxqzpjekzzukxsla.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFiZ3NweHF6cGpla3p6dWt4c2xhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgxNzQ5ODksImV4cCI6MjA5Mzc1MDk4OX0.FcFnuWvDQqndLB0q6gCkdmQ0R9dho47UPAAdEGWCbeI';
+
+let supabaseClient = null;
+let currentUser = null;
+let currentPage = 'dashboard';
+let charts = {};
+
+// Initialize Supabase
+async function initApp() {
+    supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    if (session && session.user) {
+        currentUser = session.user;
+        document.getElementById('loginScreen').style.display = 'none';
+        document.getElementById('mainContent').style.display = 'block';
+        document.getElementById('footer').style.display = 'block';
+        document.getElementById('userName').innerText = currentUser.email.split('@')[0];
+        showPage('dashboard');
+    } else {
+        document.getElementById('loginScreen').style.display = 'block';
+        document.getElementById('mainContent').style.display = 'none';
+        document.getElementById('footer').style.display = 'none';
+    }
+}
+
+async function doRegister() {
+    const name = document.getElementById('regName').value.trim();
+    const email = document.getElementById('regEmail').value.trim();
+    const password = document.getElementById('regPassword').value;
+    const confirm = document.getElementById('regConfirmPassword').value;
+    if (!name || !email) { alert('Please fill all fields'); return; }
+    if (password !== confirm) { alert('Passwords do not match'); return; }
+    if (password.length < 6) { alert('Password must be at least 6 characters'); return; }
+    const { error } = await supabaseClient.auth.signUp({ email, password, options: { data: { name } } });
+    if (error) { alert('Registration error: ' + error.message); return; }
+    alert('Registration successful! Please check your email to confirm your account.');
+    document.getElementById('regName').value = '';
+    document.getElementById('regEmail').value = '';
+    document.getElementById('regPassword').value = '';
+    document.getElementById('regConfirmPassword').value = '';
+    document.querySelector('#loginTab button[data-bs-target="#loginTabContent"]').click();
+}
+
+async function doLogin() {
+    const email = document.getElementById('loginEmail').value.trim();
+    const password = document.getElementById('loginPassword').value;
+    if (!email || !password) { alert('Please enter email and password'); return; }
+    const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+    if (error) { alert('Login failed: ' + error.message); return; }
+    currentUser = data.user;
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('mainContent').style.display = 'block';
+    document.getElementById('footer').style.display = 'block';
+    document.getElementById('userName').innerText = currentUser.email.split('@')[0];
+    showPage('dashboard');
+}
+
+async function logout() {
+    await supabaseClient.auth.signOut();
+    currentUser = null;
+    document.getElementById('loginScreen').style.display = 'block';
+    document.getElementById('mainContent').style.display = 'none';
+    document.getElementById('footer').style.display = 'none';
+}
+
+// ============= HELPER: Load Sites/Categories into Dropdowns =============
+async function loadSiteOptions(selectId) {
+    const { data: sites } = await supabaseClient.from('sites').select('id, name');
+    const select = document.getElementById(selectId);
+    if (select) {
+        select.innerHTML = '<option value="">Select Site</option>' + (sites || []).map(s => `<option value="${s.id}">${s.name}</option>`).join('');
+    }
+    return sites || [];
+}
+
+async function loadCategoryOptions(selectId) {
+    const { data: cats } = await supabaseClient.from('categories').select('id, name');
+    const select = document.getElementById(selectId);
+    if (select) {
+        select.innerHTML = '<option value="">Select Category</option>' + (cats || []).map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+    }
+    return cats || [];
+}
+
+async function loadExpenseCategoryOptions(selectId) {
+    const { data: cats } = await supabaseClient.from('expense_categories').select('id, name');
+    const select = document.getElementById(selectId);
+    if (select) {
+        select.innerHTML = '<option value="">Select Category</option>' + (cats || []).map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+    }
+    return cats || [];
+}
+
+async function loadSkillOptions(selectId) {
+    const { data: skills } = await supabaseClient.from('skills').select('name');
+    const select = document.getElementById(selectId);
+    if (select) {
+        select.innerHTML = '<option value="">Select Skills</option>' + (skills || []).map(s => `<option value="${s.name}">${s.name}</option>`).join('');
+    }
+    return skills || [];
+}
+
+// ============= PAGE RENDERING =============
+async function showPage(page) {
+    if (!currentUser) return;
+    currentPage = page;
+    const contentDiv = document.getElementById('pageContent');
+    contentDiv.innerHTML = '<div class="text-center py-5"><div class="spinner-border text-primary"></div><p>Loading...</p></div>';
+    
+    if (page === 'dashboard') await renderDashboard();
+    else if (page === 'sites') await renderSites();
+    else if (page === 'materialCategories') await renderMaterialCategories();
+    else if (page === 'expenseCategories') await renderExpenseCategories();
+    else if (page === 'materials') await renderMaterials();
+    else if (page === 'expenses') await renderExpenses();
+    else if (page === 'employees') await renderEmployees();
+    else if (page === 'attendance') await renderAttendance();
+    else if (page === 'pendingPayments') await renderPendingPayments();
+    else if (page === 'inventory') await renderInventory();
+    else if (page === 'reports') await renderReports();
+}
+
+// ============= DASHBOARD =============
+async function renderDashboard() {
+    const [sites, materials, expenses, employees, inventory] = await Promise.all([
+        supabaseClient.from('sites').select('*', { count: 'exact', head: true }),
+        supabaseClient.from('materials').select('*', { count: 'exact', head: true }),
+        supabaseClient.from('expenses').select('*', { count: 'exact', head: true }),
+        supabaseClient.from('employees').select('*', { count: 'exact', head: true }),
+        supabaseClient.from('inventory').select('*', { count: 'exact', head: true })
+    ]);
+    const totalMaterialsCost = (await supabaseClient.from('materials').select('total_cost')).data || [];
+    const totalExpensesAmount = (await supabaseClient.from('expenses').select('amount')).data || [];
+    const materialCost = totalMaterialsCost.reduce((s, m) => s + (m.total_cost || 0), 0);
+    const expenseAmount = totalExpensesAmount.reduce((s, e) => s + (e.amount || 0), 0);
+    const pendingPayments = (await supabaseClient.from('attendance').select('daily_rate').eq('is_paid', false)).data || [];
+    const pendingTotal = pendingPayments.reduce((s, a) => s + (a.daily_rate || 0), 0);
+    
+    // Fetch actual data for charts (same as reports page)
+    const materialsData = (await supabaseClient.from('materials').select('*')).data || [];
+    const expensesData = (await supabaseClient.from('expenses').select('*')).data || [];
+    
+    // Calculate chart data (exactly like reports page)
+    const topMaterials = [...materialsData].sort((a, b) => (b.total_cost || 0) - (a.total_cost || 0)).slice(0, 5);
+    const expensesByCat = {};
+    expensesData.forEach(e => { 
+        if (e.category_name) expensesByCat[e.category_name] = (expensesByCat[e.category_name] || 0) + (e.amount || 0); 
+    });
+    
+    document.getElementById('pageContent').innerHTML = `
+        <div class="row mb-4"><div class="col-12"><div class="card bg-primary text-white"><div class="card-body"><h4>Welcome to Platinum Construction LTD</h4><p>Integrated Business Management System - Construction Module</p></div></div></div></div>
+        <div class="row">
+            <div class="col-md-2"><div class="stat-card text-center" onclick="showPage('sites')"><i class="fas fa-map-marker-alt fa-3x text-primary"></i><h3>${sites.count || 0}</h3><p>Sites</p></div></div>
+            <div class="col-md-2"><div class="stat-card text-center" onclick="showPage('materials')"><i class="fas fa-cubes fa-3x text-success"></i><h3>${materials.count || 0}</h3><p>Materials</p></div></div>
+            <div class="col-md-2"><div class="stat-card text-center" onclick="showPage('expenses')"><i class="fas fa-money-bill-wave fa-3x text-warning"></i><h3>Ksh ${expenseAmount.toLocaleString()}</h3><p>Expenses</p></div></div>
+            <div class="col-md-2"><div class="stat-card text-center" onclick="showPage('inventory')"><i class="fas fa-boxes fa-3x text-info"></i><h3>${inventory.count || 0}</h3><p>Inventory</p></div></div>
+            <div class="col-md-2"><div class="stat-card text-center" onclick="showPage('employees')"><i class="fas fa-users fa-3x text-secondary"></i><h3>${employees.count || 0}</h3><p>Employees</p></div></div>
+            <div class="col-md-2"><div class="stat-card text-center" onclick="showPage('pendingPayments')"><i class="fas fa-clock fa-3x text-danger"></i><h3>Ksh ${pendingTotal.toLocaleString()}</h3><p>Pending Pay</p></div></div>
+        </div>
+        <div class="row mt-4">
+    <div class="col-md-12"><div class="card"><div class="card-header bg-primary text-white"><h6>Top 5 Materials by Cost</h6></div><div class="card-body"><canvas id="dashboardTopMaterialsChart" height="300"></canvas></div></div></div>
+</div>
+    `;
+    
+    // Create charts AFTER HTML is rendered (exactly like reports page)
+    new Chart(document.getElementById('dashboardTopMaterialsChart'), { 
+        type: 'bar', 
+        data: { 
+            labels: topMaterials.map(m => m.material_name), 
+            datasets: [{ 
+                label: 'Cost (Ksh)', 
+                data: topMaterials.map(m => m.total_cost || 0), 
+                backgroundColor: 'rgba(54, 162, 235, 0.7)' 
+            }] 
+        }, 
+        options: { responsive: true } 
+    });
+    
+    new Chart(document.getElementById('dashboardExpensesChart'), { 
+        type: 'pie', 
+        data: { 
+            labels: Object.keys(expensesByCat), 
+            datasets: [{ 
+                data: Object.values(expensesByCat), 
+                backgroundColor: ['#36a2eb', '#ffcd56', '#ff6384', '#4bc0c0', '#9966ff'] 
+            }] 
+        }, 
+        options: { responsive: true } 
+    });
+}
+
+// ============= SITES =============
+async function renderSites() {
+    const { data: sites } = await supabaseClient.from('sites').select('*').order('id');
+    let rows = '';
+    (sites || []).forEach(s => {
+        rows += `<tr>
+            <td>${s.id}</a></td>
+            <td>${s.name}</a></td>
+            <td>${s.location || '-'}</a></td>
+            <td>${s.description || '-'}</a></td>
+            <td><button class="btn btn-sm btn-warning" onclick="editSite(${s.id}, '${s.name}', '${s.location || ''}', '${s.description || ''}')">Edit</button>
+                <button class="btn btn-sm btn-danger" onclick="deleteSite(${s.id})">Delete</button></a>
+        </tr>`;
+    });
+    document.getElementById('pageContent').innerHTML = `
+        <div class="card"><div class="card-header d-flex justify-content-between"><h5>Sites</h5><button class="btn btn-primary btn-sm" onclick="showAddSiteModal()">Add Site</button></div>
+        <div class="card-body"><div class="table-responsive"><table class="table table-bordered"><thead class="table-primary"><tr><th>ID</th><th>Name</th><th>Location</th><th>Description</th><th>Actions</th></tr></thead><tbody>${rows || '<tr><td colspan="5" class="text-center">No sites found</a></td>'}</tbody></td></div></div></div>`;
+}
+
+function showAddSiteModal() {
+    const name = prompt('Site name:');
+    if (name) supabaseClient.from('sites').insert([{ name, location: '', description: '' }]).then(() => showPage('sites'));
+}
+function editSite(id, name, location, description) {
+    const newName = prompt('Edit site name:', name);
+    if (newName) supabaseClient.from('sites').update({ name: newName }).eq('id', id).then(() => showPage('sites'));
+}
+async function deleteSite(id) { if (confirm('Delete this site?')) supabaseClient.from('sites').delete().eq('id', id).then(() => showPage('sites')); }
+
+// ============= MATERIAL CATEGORIES =============
+async function renderMaterialCategories() {
+    const { data: cats } = await supabaseClient.from('categories').select('*').order('id');
+    let rows = '';
+    (cats || []).forEach(c => rows += `<tr>
+        <td>${c.id}</a></td>
+        <td>${c.name}</a></td>
+        <td><button class="btn btn-sm btn-danger" onclick="deleteCategory(${c.id})">Delete</button></a>
+    </tr>`);
+    document.getElementById('pageContent').innerHTML = `
+        <div class="card"><div class="card-header"><h5>Material Categories</h5><button class="btn btn-primary btn-sm" onclick="addCategory()">Add Category</button></div>
+        <div class="card-body"><table class="table"><thead><tr><th>ID</th><th>Name</th><th>Actions</th></tr></thead><tbody>${rows || '<tr><td colspan="3">No categories</a></td>'}</tbody></table></div></div>`;
+}
+function addCategory() { const name = prompt('Category name:'); if (name) supabaseClient.from('categories').insert([{ name }]).then(() => showPage('materialCategories')); }
+async function deleteCategory(id) { if (confirm('Delete this category?')) supabaseClient.from('categories').delete().eq('id', id).then(() => showPage('materialCategories')); }
+
+// ============= EXPENSE CATEGORIES =============
+async function renderExpenseCategories() {
+    const { data: cats } = await supabaseClient.from('expense_categories').select('*').order('id');
+    let rows = '';
+    (cats || []).forEach(c => rows += `<tr>
+        <td>${c.id}</a></td>
+        <td>${c.name}</a></td>
+        <td><button class="btn btn-sm btn-danger" onclick="deleteExpenseCategory(${c.id})">Delete</button></a>
+    </tr>`);
+    document.getElementById('pageContent').innerHTML = `
+        <div class="card"><div class="card-header"><h5>Expense Categories</h5><button class="btn btn-primary btn-sm" onclick="addExpenseCategory()">Add Category</button></div>
+        <div class="card-body"><table class="table"><thead><tr><th>ID</th><th>Name</th><th>Actions</th></tr></thead><tbody>${rows || '<tr><td colspan="3">No categories</a></td>'}</tbody></td></div></div>`;
+}
+function addExpenseCategory() { const name = prompt('Category name:'); if (name) supabaseClient.from('expense_categories').insert([{ name }]).then(() => showPage('expenseCategories')); }
+async function deleteExpenseCategory(id) { if (confirm('Delete this category?')) supabaseClient.from('expense_categories').delete().eq('id', id).then(() => showPage('expenseCategories')); }
+
+// ============= MATERIALS WITH MODAL FORM =============
+async function renderMaterials() {
+    const [materials, sites, categories] = await Promise.all([
+        supabaseClient.from('materials').select('*').order('id'),
+        supabaseClient.from('sites').select('id, name'),
+        supabaseClient.from('categories').select('id, name')
+    ]);
+    const siteMap = Object.fromEntries((sites.data || []).map(s => [s.id, s.name]));
+    const catMap = Object.fromEntries((categories.data || []).map(c => [c.id, c.name]));
+    let rows = '', total = 0;
+    (materials.data || []).forEach(m => {
+        total += m.total_cost || 0;
+        rows += `<tr>
+            <td>${m.purchase_date || '-'}</a></td>
+            <td>${siteMap[m.site_id] || '-'}</a></td>
+            <td>${m.material_name}</a></td>
+            <td>${catMap[m.category_id] || '-'}</a></td>
+            <td>${m.quantity || 0} ${m.unit || 'pieces'}</a></td>
+            <td>Ksh ${(m.unit_cost || 0).toLocaleString()}</a></td><td class="fw-bold">Ksh ${(m.total_cost || 0).toLocaleString()}</a></td>
+            <td>${m.supplier || '-'}</a></td>
+            <td><button class="btn btn-sm btn-danger" onclick="deleteMaterial(${m.id})">Delete</button></a>
+        </tr>`;
+    });
+    document.getElementById('pageContent').innerHTML = `
+        <div class="card"><div class="card-header d-flex justify-content-between"><h5>Materials Purchased</h5><button class="btn btn-primary btn-sm" onclick="showAddMaterialModal()">Add Material</button></div>
+        <div class="card-body"><div class="table-responsive"><table class="table table-bordered"><thead class="table-primary"><tr><th>Date</th><th>Site</th><th>Material</th><th>Category</th><th>Quantity</th><th>Unit Cost</th><th>Total</th><th>Supplier</th><th>Actions</th></tr></thead><tbody>${rows || '<tr><td colspan="9" class="text-center">No materials found</a></td>'}</tbody><tfoot><tr class="table-secondary"><th colspan="6" class="text-end">Total:</th><th colspan="3">Ksh ${total.toLocaleString()}</th></tr></tfoot></table></div></div></div>
+        <div class="modal fade" id="materialModal" tabindex="-1"><div class="modal-dialog"><div class="modal-content"><div class="modal-header bg-primary text-white"><h5 class="modal-title">Add Material Purchase</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div>
+        <div class="modal-body"><div class="mb-3"><label class="form-label">Site</label><select id="materialSiteId" class="form-control"></select></div>
+        <div class="mb-3"><label class="form-label">Category</label><div class="input-group"><select id="materialCategoryId" class="form-control"></select><button class="btn btn-outline-primary" onclick="quickAddCategory()">+ New</button></div></div>
+        <div class="mb-3"><label class="form-label">Material Name</label><input type="text" id="materialName" class="form-control"></div>
+        <div class="row"><div class="col-md-6"><label class="form-label">Quantity</label><input type="number" step="0.01" id="materialQuantity" class="form-control"></div><div class="col-md-6"><label class="form-label">Unit</label><input type="text" id="materialUnit" class="form-control" placeholder="pieces"></div></div>
+        <div class="row"><div class="col-md-6"><label class="form-label">Unit Cost (Ksh)</label><input type="number" step="0.01" id="materialUnitCost" class="form-control"></div><div class="col-md-6"><label class="form-label">Purchase Date</label><input type="date" id="materialPurchaseDate" class="form-control"></div></div>
+        <div class="mb-3"><label class="form-label">Supplier</label><input type="text" id="materialSupplier" class="form-control"></div>
+        <div class="mb-3"><label class="form-label">Received By</label><input type="text" id="materialReceivedBy" class="form-control"></div>
+        <div class="mb-3"><label class="form-label">Notes</label><textarea id="materialNotes" class="form-control" rows="2"></textarea></div></div>
+        <div class="modal-footer"><button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button><button class="btn btn-primary" onclick="saveMaterial()">Save</button></div></div></div></div>`;
+    await loadSiteOptions('materialSiteId');
+    await loadCategoryOptions('materialCategoryId');
+}
+async function quickAddCategory() {
+    const name = prompt('Enter new category name:');
+    if (name) { await supabaseClient.from('categories').insert([{ name }]); await loadCategoryOptions('materialCategoryId'); alert('Category added!'); }
+}
+async function saveMaterial() {
+    const data = {
+        site_id: parseInt(document.getElementById('materialSiteId').value),
+        category_id: parseInt(document.getElementById('materialCategoryId').value),
+        material_name: document.getElementById('materialName').value,
+        quantity: parseFloat(document.getElementById('materialQuantity').value) || 0,
+        unit: document.getElementById('materialUnit').value || 'pieces',
+        unit_cost: parseFloat(document.getElementById('materialUnitCost').value) || 0,
+        purchase_date: document.getElementById('materialPurchaseDate').value,
+        supplier: document.getElementById('materialSupplier').value,
+        received_by: document.getElementById('materialReceivedBy').value,
+        notes: document.getElementById('materialNotes').value
+    };
+    data.total_cost = data.quantity * data.unit_cost;
+    if (!data.material_name) { alert('Material name required'); return; }
+    await supabaseClient.from('materials').insert([data]);
+    bootstrap.Modal.getInstance(document.getElementById('materialModal')).hide();
+    showPage('materials');
+}
+function showAddMaterialModal() { new bootstrap.Modal(document.getElementById('materialModal')).show(); }
+async function deleteMaterial(id) { if (confirm('Delete this material?')) supabaseClient.from('materials').delete().eq('id', id).then(() => showPage('materials')); }
+
+// ============= EXPENSES WITH MODAL FORM =============
+async function renderExpenses() {
+    const [expenses, sites, categories] = await Promise.all([
+        supabaseClient.from('expenses').select('*').order('id'),
+        supabaseClient.from('sites').select('id, name'),
+        supabaseClient.from('expense_categories').select('id, name')
+    ]);
+    const siteMap = Object.fromEntries((sites.data || []).map(s => [s.id, s.name]));
+    const catMap = Object.fromEntries((categories.data || []).map(c => [c.id, c.name]));
+    let rows = '', total = 0;
+    (expenses.data || []).forEach(e => {
+        total += e.amount || 0;
+        rows += `<tr>
+            <td>${e.expense_date || '-'}</a></td>
+            <td>${siteMap[e.site_id] || '-'}</a></td>
+            <td>${catMap[e.category_id] || '-'}</a></td>
+            <td>${e.description || '-'}</a></td><td class="fw-bold">Ksh ${(e.amount || 0).toLocaleString()}</a></td>
+            <td><button class="btn btn-sm btn-danger" onclick="deleteExpense(${e.id})">Delete</button></a>
+        </tr>`;
+    });
+    document.getElementById('pageContent').innerHTML = `
+        <div class="card"><div class="card-header d-flex justify-content-between"><h5>Expenses</h5><button class="btn btn-primary btn-sm" onclick="showAddExpenseModal()">Add Expense</button></div>
+        <div class="card-body"><div class="table-responsive"><table class="table table-bordered"><thead class="table-primary"><tr><th>Date</th><th>Site</th><th>Category</th><th>Description</th><th>Amount</th><th>Actions</th></tr></thead><tbody>${rows || '<tr><td colspan="6" class="text-center">No expenses found</a></td>'}</tbody><tfoot><tr class="table-secondary"><th colspan="4" class="text-end">Total:</th><th colspan="2">Ksh ${total.toLocaleString()}</th></tr></tfoot></table></div></div></div>
+        <div class="modal fade" id="expenseModal" tabindex="-1"><div class="modal-dialog"><div class="modal-content"><div class="modal-header bg-primary text-white"><h5 class="modal-title">Add Expense</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div>
+        <div class="modal-body"><div class="mb-3"><label class="form-label">Site</label><select id="expenseSiteId" class="form-control"></select></div>
+        <div class="mb-3"><label class="form-label">Category</label><div class="input-group"><select id="expenseCategoryId" class="form-control"></select><button class="btn btn-outline-primary" onclick="quickAddExpenseCategory()">+ New</button></div></div>
+        <div class="mb-3"><label class="form-label">Amount (Ksh)</label><input type="number" step="0.01" id="expenseAmount" class="form-control"></div>
+        <div class="mb-3"><label class="form-label">Expense Date</label><input type="date" id="expenseDate" class="form-control"></div>
+        <div class="mb-3"><label class="form-label">Description</label><textarea id="expenseDescription" class="form-control" rows="2"></textarea></div>
+        <div class="mb-3"><label class="form-label">Receipt Number</label><input type="text" id="expenseReceipt" class="form-control"></div></div>
+        <div class="modal-footer"><button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button><button class="btn btn-primary" onclick="saveExpense()">Save</button></div></div></div></div>`;
+    await loadSiteOptions('expenseSiteId');
+    await loadExpenseCategoryOptions('expenseCategoryId');
+}
+async function quickAddExpenseCategory() {
+    const name = prompt('Enter new expense category name:');
+    if (name) { await supabaseClient.from('expense_categories').insert([{ name }]); await loadExpenseCategoryOptions('expenseCategoryId'); alert('Category added!'); }
+}
+async function saveExpense() {
+    const data = {
+        site_id: parseInt(document.getElementById('expenseSiteId').value),
+        category_id: parseInt(document.getElementById('expenseCategoryId').value),
+        amount: parseFloat(document.getElementById('expenseAmount').value) || 0,
+        expense_date: document.getElementById('expenseDate').value,
+        description: document.getElementById('expenseDescription').value,
+        receipt_number: document.getElementById('expenseReceipt').value
+    };
+    if (!data.amount) { alert('Amount required'); return; }
+    await supabaseClient.from('expenses').insert([data]);
+    bootstrap.Modal.getInstance(document.getElementById('expenseModal')).hide();
+    showPage('expenses');
+}
+function showAddExpenseModal() { new bootstrap.Modal(document.getElementById('expenseModal')).show(); }
+async function deleteExpense(id) { if (confirm('Delete this expense?')) supabaseClient.from('expenses').delete().eq('id', id).then(() => showPage('expenses')); }
+
+// ============= EMPLOYEES WITH MODAL FORM =============
+async function renderEmployees() {
+    const [employees, sites] = await Promise.all([
+        supabaseClient.from('employees').select('*').order('id'),
+        supabaseClient.from('sites').select('id, name')
+    ]);
+    const siteMap = Object.fromEntries((sites.data || []).map(s => [s.id, s.name]));
+    let rows = '';
+    (employees.data || []).forEach(e => {
+        rows += `<tr>
+            <td>${e.names}</a></td>
+            <td>${e.id_number}</a></td>
+            <td>${e.phone_number || '-'}</a></td>
+            <td>${siteMap[e.site_id] || '-'}</a></td>
+            <td>Ksh ${(e.daily_rate || 0).toLocaleString()}</a></td>
+            <td>${e.skills || '-'}</a></td>
+            <td><span class="badge ${e.is_active ? 'bg-success' : 'bg-danger'}">${e.is_active ? 'Active' : 'Inactive'}</span></a></td>
+            <td><button class="btn btn-sm btn-warning" onclick="editEmployee(${e.id}, '${e.names}', ${e.daily_rate})">Edit</button>
+                <button class="btn btn-sm btn-danger" onclick="deleteEmployee(${e.id})">Delete</button></a>
+        </tr>`;
+    });
+    document.getElementById('pageContent').innerHTML = `
+        <div class="card"><div class="card-header d-flex justify-content-between"><h5>Employees</h5><button class="btn btn-primary btn-sm" onclick="showAddEmployeeModal()">Add Employee</button></div>
+        <div class="card-body"><div class="table-responsive"><table class="table table-bordered"><thead class="table-primary"><tr><th>Name</th><th>ID Number</th><th>Phone</th><th>Site</th><th>Daily Rate</th><th>Skills</th><th>Status</th><th>Actions</th></tr></thead><tbody>${rows || '<tr><td colspan="8" class="text-center">No employees found</a></td>'}</tbody></table></div></div></div>
+        <div class="modal fade" id="employeeModal" tabindex="-1"><div class="modal-dialog"><div class="modal-content"><div class="modal-header bg-primary text-white"><h5 class="modal-title">Add Employee</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div>
+        <div class="modal-body"><div class="mb-3"><label class="form-label">Full Name</label><input type="text" id="employeeNames" class="form-control"></div>
+        <div class="mb-3"><label class="form-label">ID Number</label><input type="text" id="employeeIdNumber" class="form-control"></div>
+        <div class="mb-3"><label class="form-label">Phone Number</label><input type="text" id="employeePhone" class="form-control"></div>
+        <div class="mb-3"><label class="form-label">Site</label><select id="employeeSiteId" class="form-control"></select></div>
+        <div class="mb-3"><label class="form-label">Daily Rate (Ksh)</label><input type="number" step="0.01" id="employeeDailyRate" class="form-control"></div>
+        <div class="mb-3"><label class="form-label">Skills</label><div class="input-group"><select id="employeeSkills" class="form-control"></select><button class="btn btn-outline-primary" onclick="quickAddSkill()">+ New</button></div></div>
+        <div class="mb-3"><label class="form-label">Registration Date</label><input type="date" id="employeeRegDate" class="form-control"></div></div>
+        <div class="modal-footer"><button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button><button class="btn btn-primary" onclick="saveEmployee()">Save</button></div></div></div></div>`;
+    await loadSiteOptions('employeeSiteId');
+    await loadSkillOptions('employeeSkills');
+}
+async function quickAddSkill() {
+    const name = prompt('Enter new skill name:');
+    if (name) { await supabaseClient.from('skills').insert([{ name }]); await loadSkillOptions('employeeSkills'); alert('Skill added!'); }
+}
+async function saveEmployee() {
+    const data = {
+        names: document.getElementById('employeeNames').value,
+        id_number: document.getElementById('employeeIdNumber').value,
+        phone_number: document.getElementById('employeePhone').value,
+        site_id: parseInt(document.getElementById('employeeSiteId').value),
+        daily_rate: parseFloat(document.getElementById('employeeDailyRate').value) || 0,
+        skills: document.getElementById('employeeSkills').value,
+        reg_date: document.getElementById('employeeRegDate').value,
+        is_active: true
+    };
+    if (!data.names || !data.id_number) { alert('Name and ID Number required'); return; }
+    await supabaseClient.from('employees').insert([data]);
+    bootstrap.Modal.getInstance(document.getElementById('employeeModal')).hide();
+    showPage('employees');
+}
+function showAddEmployeeModal() { new bootstrap.Modal(document.getElementById('employeeModal')).show(); }
+async function editEmployee(id, names, dailyRate) {
+    const newNames = prompt('Edit name:', names);
+    const newRate = parseFloat(prompt('Edit daily rate:', dailyRate));
+    if (newNames) supabaseClient.from('employees').update({ names: newNames, daily_rate: newRate }).eq('id', id).then(() => showPage('employees'));
+}
+async function deleteEmployee(id) { if (confirm('Delete this employee?')) supabaseClient.from('employees').delete().eq('id', id).then(() => showPage('employees')); }
+
+// ============= ATTENDANCE =============
+async function renderAttendance() {
+    const [attendance, employees] = await Promise.all([
+        supabaseClient.from('attendance').select('*').order('id'),
+        supabaseClient.from('employees').select('id, names, daily_rate')
+    ]);
+    const empMap = Object.fromEntries((employees.data || []).map(e => [e.id, e]));
+    let rows = '';
+    (attendance.data || []).forEach(a => {
+        rows += `<tr>
+            <td>${a.report_date || '-'}</a></td>
+            <td>${empMap[a.employee_id]?.names || '-'}</a></td>
+            <td>Ksh ${(a.daily_rate || 0).toLocaleString()}</a></td>
+            <td><span class="badge ${a.is_paid ? 'bg-success' : 'bg-warning'}">${a.is_paid ? 'Paid' : 'Unpaid'}</span></a></td>
+            <td><button class="btn btn-sm btn-danger" onclick="deleteAttendance(${a.id})">Delete</button></a>
+        </tr>`;
+    });
+    document.getElementById('pageContent').innerHTML = `
+        <div class="card"><div class="card-header d-flex justify-content-between"><h5>Attendance</h5><button class="btn btn-primary btn-sm" onclick="showAddAttendanceModal()">Mark Attendance</button></div>
+        <div class="card-body"><div class="table-responsive"><table class="table table-bordered"><thead class="table-primary"><tr><th>Date</th><th>Employee</th><th>Daily Rate</th><th>Status</th><th>Actions</th></tr></thead><tbody>${rows || '<tr><td colspan="5" class="text-center">No attendance records</a></td>'}</tbody></table></div></div></div>
+        <div class="modal fade" id="attendanceModal" tabindex="-1"><div class="modal-dialog"><div class="modal-content"><div class="modal-header bg-primary text-white"><h5 class="modal-title">Mark Attendance</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div>
+        <div class="modal-body"><div class="mb-3"><label class="form-label">Employee</label><select id="attendanceEmployeeId" class="form-control"></select></div>
+        <div class="mb-3"><label class="form-label">Date</label><input type="date" id="attendanceDate" class="form-control"></div>
+        <div class="mb-3"><label class="form-label">Comments</label><textarea id="attendanceComments" class="form-control" rows="2"></textarea></div></div>
+        <div class="modal-footer"><button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button><button class="btn btn-primary" onclick="saveAttendance()">Save</button></div></div></div></div>`;
+    const { data: emps } = await supabaseClient.from('employees').select('id, names, daily_rate');
+    const select = document.getElementById('attendanceEmployeeId');
+    select.innerHTML = '<option value="">Select Employee</option>' + (emps || []).map(e => `<option value="${e.id}">${e.names} (Ksh ${e.daily_rate})</option>`).join('');
+}
+async function saveAttendance() {
+    const empId = document.getElementById('attendanceEmployeeId').value;
+    const emp = (await supabaseClient.from('employees').select('daily_rate').eq('id', empId).single()).data;
+    const data = {
+        employee_id: parseInt(empId),
+        report_date: document.getElementById('attendanceDate').value,
+        daily_rate: emp?.daily_rate || 0,
+        is_paid: false,
+        comments: document.getElementById('attendanceComments').value
+    };
+    if (!data.employee_id || !data.report_date) { alert('Employee and date required'); return; }
+    await supabaseClient.from('attendance').insert([data]);
+    bootstrap.Modal.getInstance(document.getElementById('attendanceModal')).hide();
+    showPage('attendance');
+}
+function showAddAttendanceModal() { new bootstrap.Modal(document.getElementById('attendanceModal')).show(); }
+async function deleteAttendance(id) { if (confirm('Delete this attendance record?')) supabaseClient.from('attendance').delete().eq('id', id).then(() => showPage('attendance')); }
+
+// ============= PENDING PAYMENTS =============
+async function renderPendingPayments() {
+    const { data: attendance } = await supabaseClient.from('attendance').select('*, employees(names)').eq('is_paid', false);
+    let rows = '', total = 0;
+    (attendance || []).forEach(a => {
+        total += a.daily_rate;
+        rows += `<tr>
+            <td>${a.employees?.names || '-'}</a></td>
+            <td>Ksh ${(a.daily_rate || 0).toLocaleString()}</a></td>
+            <td><button class="btn btn-sm btn-success" onclick="processPayment(${a.id}, ${a.daily_rate})">Pay Now</button></a>
+        </tr>`;
+    });
+    document.getElementById('pageContent').innerHTML = `
+        <div class="card"><div class="card-header"><h5>Pending Salary Payments</h5></div>
+        <div class="card-body"><div class="alert alert-warning">Total Pending: Ksh ${total.toLocaleString()}</div>
+        <div class="table-responsive"><table class="table table-bordered"><thead class="table-primary"><tr><th>Employee</th><th>Amount</th><th>Action</th></tr></thead><tbody>${rows || '<td><td colspan="3" class="text-center">No pending payments</a></td>'}</tbody></table></div></div></div>`;
+}
+async function processPayment(id, amount) {
+    if (confirm(`Process Ksh ${amount.toLocaleString()} payment?`)) {
+        await supabaseClient.from('attendance').update({ is_paid: true }).eq('id', id);
+        showPage('pendingPayments');
+        showPage('dashboard');
+    }
+}
+
+// ============= INVENTORY WITH MODAL FORM =============
+async function renderInventory() {
+    const [inventory, sites] = await Promise.all([
+        supabaseClient.from('inventory').select('*').order('id'),
+        supabaseClient.from('sites').select('id, name')
+    ]);
+    const siteMap = Object.fromEntries((sites.data || []).map(s => [s.id, s.name]));
+    let rows = '';
+    (inventory.data || []).forEach(i => {
+        rows += `<tr>
+            <td>${i.item_name}</a></td>
+            <td>${i.category || '-'}</a></td>
+            <td>${i.serial_number || '-'}</a></td>
+            <td>${siteMap[i.current_site_id] || '-'}</a></td>
+            <td>${i.quantity}</a></td>
+            <td><span class="badge bg-success">${i.status}</span></a></td>
+            <td>Ksh ${(i.purchase_cost || 0).toLocaleString()}</a></td>
+            <td>
+                <button class="btn btn-sm btn-info" onclick="transferInventory(${i.id})">Transfer</button>
+                <button class="btn btn-sm btn-warning" onclick="markDamaged(${i.id})">Damaged</button>
+                <button class="btn btn-sm btn-danger" onclick="markLost(${i.id})">Lost</button>
+                <button class="btn btn-sm btn-secondary" onclick="deleteInventory(${i.id})">Delete</button>
+            </a>
+        </tr>`;
+    });
+    document.getElementById('pageContent').innerHTML = `
+        <div class="card"><div class="card-header d-flex justify-content-between"><h5>Inventory</h5><button class="btn btn-primary btn-sm" onclick="showAddInventoryModal()">Add Inventory</button></div>
+        <div class="card-body"><div class="table-responsive"><table class="table table-bordered"><thead class="table-primary"><tr><th>Item</th><th>Category</th><th>Serial</th><th>Site</th><th>Qty</th><th>Status</th><th>Cost</th><th>Actions</th></tr></thead><tbody>${rows || '<tr><td colspan="8">No inventory items</a></td>'}</tbody></td></div></div></div>
+        <div class="modal fade" id="inventoryModal" tabindex="-1"><div class="modal-dialog"><div class="modal-content"><div class="modal-header bg-primary text-white"><h5 class="modal-title">Add Inventory Item</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div>
+        <div class="modal-body"><div class="mb-3"><label class="form-label">Item Name</label><input type="text" id="inventoryItemName" class="form-control"></div>
+        <div class="mb-3"><label class="form-label">Category</label><input type="text" id="inventoryCategory" class="form-control" placeholder="Power Tools, Heavy Equipment"></div>
+        <div class="mb-3"><label class="form-label">Serial Number</label><input type="text" id="inventorySerial" class="form-control"></div>
+        <div class="mb-3"><label class="form-label">Current Site</label><select id="inventorySiteId" class="form-control"></select></div>
+        <div class="row"><div class="col-md-6"><label class="form-label">Purchase Date</label><input type="date" id="inventoryPurchaseDate" class="form-control"></div><div class="col-md-6"><label class="form-label">Purchase Cost (Ksh)</label><input type="number" step="0.01" id="inventoryCost" class="form-control"></div></div>
+        <div class="mb-3"><label class="form-label">Quantity</label><input type="number" id="inventoryQuantity" class="form-control" value="1"></div>
+        <div class="mb-3"><label class="form-label">Notes</label><textarea id="inventoryNotes" class="form-control" rows="2"></textarea></div></div>
+        <div class="modal-footer"><button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button><button class="btn btn-primary" onclick="saveInventory()">Save</button></div></div></div></div>`;
+    await loadSiteOptions('inventorySiteId');
+}
+async function saveInventory() {
+    const data = {
+        item_name: document.getElementById('inventoryItemName').value,
+        category: document.getElementById('inventoryCategory').value,
+        serial_number: document.getElementById('inventorySerial').value,
+        current_site_id: parseInt(document.getElementById('inventorySiteId').value),
+        purchase_date: document.getElementById('inventoryPurchaseDate').value,
+        purchase_cost: parseFloat(document.getElementById('inventoryCost').value) || 0,
+        quantity: parseInt(document.getElementById('inventoryQuantity').value) || 1,
+        status: 'available',
+        notes: document.getElementById('inventoryNotes').value
+    };
+    if (!data.item_name) { alert('Item name required'); return; }
+    await supabaseClient.from('inventory').insert([data]);
+    bootstrap.Modal.getInstance(document.getElementById('inventoryModal')).hide();
+    showPage('inventory');
+}
+function showAddInventoryModal() { new bootstrap.Modal(document.getElementById('inventoryModal')).show(); }
+async function transferInventory(id) {
+    const sites = (await supabaseClient.from('sites').select('id, name')).data || [];
+    const siteOptions = sites.map(s => `${s.id}. ${s.name}`).join('\n');
+    const newSiteId = parseInt(prompt('Transfer to Site ID:\n' + siteOptions));
+    if (newSiteId) await supabaseClient.from('inventory').update({ current_site_id: newSiteId, status: 'transferred' }).eq('id', id);
+    showPage('inventory');
+}
+async function markDamaged(id) { if (confirm('Mark as damaged?')) await supabaseClient.from('inventory').update({ status: 'damaged' }).eq('id', id).then(() => showPage('inventory')); }
+async function markLost(id) { if (confirm('Mark as lost?')) await supabaseClient.from('inventory').update({ status: 'lost' }).eq('id', id).then(() => showPage('inventory')); }
+async function deleteInventory(id) { if (confirm('Delete this item?')) supabaseClient.from('inventory').delete().eq('id', id).then(() => showPage('inventory')); }
+
+// ============= REPORTS WITH FILTERS =============
+async function renderReports() {
+    const [materials, expenses, sites] = await Promise.all([
+        supabaseClient.from('materials').select('*'),
+        supabaseClient.from('expenses').select('*'),
+        supabaseClient.from('sites').select('name')
+    ]);
+    const materialsData = materials.data || [];
+    const expensesData = expenses.data || [];
+    
+    const totalMaterials = materialsData.reduce((s, m) => s + (m.total_cost || 0), 0);
+    const totalExpenses = expensesData.reduce((s, e) => s + (e.amount || 0), 0);
+    const topMaterials = [...materialsData].sort((a, b) => (b.total_cost || 0) - (a.total_cost || 0)).slice(0, 5);
+    const expensesByCat = {};
+    expensesData.forEach(e => { if (e.category_name) expensesByCat[e.category_name] = (expensesByCat[e.category_name] || 0) + (e.amount || 0); });
+    const materialsBySite = {};
+    materialsData.forEach(m => { if (m.site_name) materialsBySite[m.site_name] = (materialsBySite[m.site_name] || 0) + (m.total_cost || 0); });
+    
+    document.getElementById('pageContent').innerHTML = `
+        <div class="row mb-4"><div class="col-12"><div class="card bg-primary text-white"><div class="card-body"><h4>Reports Dashboard</h4><p>Comprehensive view of materials, expenses, inventory, and employee data</p></div></div></div></div>
+        <div class="row mb-4">
+            <div class="col-md-2"><div class="stat-card"><h6>Total Spent</h6><h4>Ksh ${(totalMaterials + totalExpenses).toLocaleString()}</h4></div></div>
+            <div class="col-md-2"><div class="stat-card"><h6>Materials</h6><h4>Ksh ${totalMaterials.toLocaleString()}</h4></div></div>
+            <div class="col-md-2"><div class="stat-card"><h6>Expenses</h6><h4>Ksh ${totalExpenses.toLocaleString()}</h4></div></div>
+            <div class="col-md-2"><div class="stat-card"><h6>Inventory Value</h6><h4>Ksh ${(await supabaseClient.from('inventory').select('purchase_cost')).data?.reduce((s,i)=>s+(i.purchase_cost||0),0).toLocaleString() || 0}</h4></div></div>
+            <div class="col-md-2"><div class="stat-card"><h6>Wages Paid</h6><h4>Ksh ${(await supabaseClient.from('attendance').select('daily_rate').eq('is_paid',true)).data?.reduce((s,a)=>s+(a.daily_rate||0),0).toLocaleString() || 0}</h4></div></div>
+            <div class="col-md-2"><div class="stat-card"><h6>Top Site</h6><h5>${Object.keys(materialsBySite)[0] || 'N/A'}</h5></div></div>
+        </div>
+        <div class="filter-bar"><div class="row"><div class="col-md-3"><label>Site</label><select id="reportSite" class="form-select"><option value="all">All Sites</option>${(sites.data || []).map(s => `<option value="${s.name}">${s.name}</option>`).join('')}</select></div>
+        <div class="col-md-3"><label>Date From</label><input type="date" id="reportDateFrom" class="form-control"></div>
+        <div class="col-md-3"><label>Date To</label><input type="date" id="reportDateTo" class="form-control"></div>
+        <div class="col-md-3"><label>Search</label><input type="text" id="reportSearch" class="form-control" placeholder="Search..."></div></div>
+        <div class="row mt-2"><div class="col-md-12"><button class="btn btn-primary" onclick="applyReportFilters()">Apply Filters</button><button class="btn btn-secondary ms-2" onclick="clearReportFilters()">Clear</button></div></div></div>
+        <div class="row mb-4">
+            <div class="col-md-6"><div class="card"><div class="card-header bg-primary text-white"><h6>Top 5 Materials by Cost</h6></div><div class="card-body"><canvas id="topMaterialsChart" height="250"></canvas></div></div></div>
+            <div class="col-md-6"><div class="card"><div class="card-header bg-success text-white"><h6>Expenses by Category</h6></div><div class="card-body"><canvas id="expensesChart" height="250"></canvas></div></div></div>
+        </div>
+        <div class="row mb-4"><div class="col-md-12"><div class="card"><div class="card-header bg-info text-white"><h6>Materials Cost by Site</h6></div><div class="card-body"><canvas id="sitesChart" height="200"></canvas></div></div></div></div>`;
+    
+    new Chart(document.getElementById('topMaterialsChart'), { type: 'bar', data: { labels: topMaterials.map(m => m.material_name), datasets: [{ label: 'Cost (Ksh)', data: topMaterials.map(m => m.total_cost || 0), backgroundColor: 'rgba(54, 162, 235, 0.7)' }] }, options: { responsive: true } });
+    new Chart(document.getElementById('expensesChart'), { type: 'pie', data: { labels: Object.keys(expensesByCat), datasets: [{ data: Object.values(expensesByCat), backgroundColor: ['#36a2eb', '#ffcd56', '#ff6384', '#4bc0c0', '#9966ff'] }] }, options: { responsive: true } });
+    new Chart(document.getElementById('sitesChart'), { type: 'bar', data: { labels: Object.keys(materialsBySite), datasets: [{ label: 'Materials Cost (Ksh)', data: Object.values(materialsBySite), backgroundColor: 'rgba(75, 192, 192, 0.7)' }] }, options: { responsive: true } });
+}
+function applyReportFilters() { alert('Filters coming soon - refresh to apply'); showPage('reports'); }
+function clearReportFilters() { showPage('reports'); }
+
+// Utility functions
+function showProfile() { alert(`User: ${currentUser?.email}`); }
+function showChangePassword() { alert('Password change - coming soon'); }
+function showSettings() { alert('Settings - coming soon'); }
+function showAbout() { alert('Platinum Construction Management v3.0\nDeveloped by AVC Tech\n© 2025'); }
+function showPrivacy() { alert('Privacy Policy'); }
+function showTerms() { alert('Terms of Service - 7 day free trial'); }
+
+initApp();
+</script>
+</body>
+</html>
