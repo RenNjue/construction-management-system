@@ -256,6 +256,14 @@ async function doLogin() {
     if (error) { alert('Login failed: ' + error.message); return; }
     currentUser = data.user;
     await loadUserProfile();
+    
+    // ✅ ADD THIS CHECK - Prevent deactivated users from logging in
+    if (currentUserProfile?.is_active === false) {
+        alert('⛔ ACCOUNT DEACTIVATED\n\nYour account has been deactivated by an administrator.\nPlease contact your system administrator for assistance.');
+        await logout();
+        return;
+    }
+    
     document.getElementById('loginScreen').style.display = 'none';
     document.getElementById('mainContent').style.display = 'block';
     document.getElementById('footer').style.display = 'block';
@@ -1150,58 +1158,195 @@ function checkEmailSchedule() { const sched = JSON.parse(localStorage.getItem('p
 // ============= ADMIN PANEL =============
 async function showAdminPanel() {
     if (!isAdmin()) { alert('Access denied'); return; }
-    const { data: users } = await supabaseClient.from('profiles').select('*, sites(name)');
-    const { data: sites } = await supabaseClient.from('sites').select('id, name');
+    const { data: users } = await supabaseClient.from('profiles').select('*, sites(name)').order('created_at', { ascending: false });
+    const { data: sites } = await supabaseClient.from('sites').select('id, name').order('name');
+    
+    const activeCount = (users || []).filter(u => u.is_active !== false).length;
+    const inactiveCount = (users || []).filter(u => u.is_active === false).length;
+    
     let userRows = '';
     (users || []).forEach(u => {
+        const isCurrentUser = u.id === currentUser.id;
+        const isAdminUser = u.role === 'admin';
+        const canDeactivate = !isCurrentUser && !isAdminUser;
+        const isUserActive = u.is_active !== false;
+        
         userRows += `<tr>
-            <td>${escapeHtml(u.email)}</td><td>${escapeHtml(u.full_name || '-')}</td>
-            <td><select id="role_${u.id}" class="form-select form-select-sm" onchange="updateUserRole('${u.id}', this.value)">
-                <option value="site_manager" ${u.role === 'site_manager' ? 'selected' : ''}>Site Manager</option>
-                <option value="admin" ${u.role === 'admin' ? 'selected' : ''}>Admin</option>
-            </select></td>
-            <td><select id="site_${u.id}" class="form-select form-select-sm" onchange="updateUserSite('${u.id}', this.value)">
-                <option value="">No Site Assigned</option>
-                ${(sites||[]).map(s => `<option value="${s.id}" ${u.assigned_site_id === s.id ? 'selected' : ''}>${escapeHtml(s.name)}</option>`).join('')}
-            </select></td>
+            <td>${escapeHtml(u.email)}</td>
+            <td>${escapeHtml(u.full_name || '-')}</td>
+            <td>${u.role === 'admin' ? '<span class="badge bg-danger">Admin</span>' : '<span class="badge bg-primary">Site Manager</span>'}</td>
+            <td>
+                <select id="site_${u.id}" class="form-select form-select-sm" onchange="updateUserSite('${u.id}', this.value)" ${u.role === 'admin' ? 'disabled' : ''}>
+                    <option value="">No Site Assigned</option>
+                    ${(sites||[]).map(s => `<option value="${s.id}" ${u.assigned_site_id === s.id ? 'selected' : ''}>${escapeHtml(s.name)}</option>`).join('')}
+                </select>
+             </td>
+            <td>
+                <select id="role_${u.id}" class="form-select form-select-sm" onchange="updateUserRole('${u.id}', this.value)" ${isCurrentUser ? 'disabled' : ''}>
+                    <option value="site_manager" ${u.role === 'site_manager' ? 'selected' : ''}>Site Manager</option>
+                    <option value="admin" ${u.role === 'admin' ? 'selected' : ''}>Admin</option>
+                </select>
+             </td>
+            <td>
+                <div class="d-flex align-items-center gap-2">
+                    <span class="badge ${isUserActive ? 'bg-success' : 'bg-secondary'}">
+                        ${isUserActive ? 'Active' : 'Inactive'}
+                    </span>
+                    ${canDeactivate ? 
+                        `<button class="btn btn-sm ${isUserActive ? 'btn-warning' : 'btn-success'}" onclick="toggleUserStatus('${u.id}', '${escapeHtml(u.email)}', ${isUserActive})">
+                            <i class="fas ${isUserActive ? 'fa-ban' : 'fa-check-circle'}"></i> 
+                            ${isUserActive ? 'Deactivate' : 'Activate'}
+                        </button>` : 
+                        `<span class="text-muted"><i class="fas fa-lock"></i> Protected</span>`
+                    }
+                </div>
+             </td>
         </tr>`;
     });
+    
     document.getElementById('pageContent').innerHTML = `
-        <div class="card"><div class="card-header bg-primary text-white"><h5 class="mb-0"><i class="fas fa-users-cog me-2"></i>User Management</h5></div>
-        <div class="card-body"><div class="table-responsive"><table class="table table-bordered"><thead class="table-primary"><tr><th>Email</th><th>Name</th><th>Role</th><th>Assigned Site</th></tr></thead><tbody>${userRows}</tbody></table></div>
-        <div class="alert alert-info mt-3"><i class="fas fa-info-circle me-2"></i><strong>Registration Password:</strong> Set in database table <code>app_settings</code> with key 'registration_password'<br>
-        <strong>Current Users:</strong> ${(users||[]).length} total users | ${(users||[]).filter(u=>u.role==='admin').length} Admins | ${(users||[]).filter(u=>u.role==='site_manager').length} Site Managers</div></div></div>`;
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="fas fa-users-cog me-2"></i>User Management</h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-3 mb-4">
+                    <div class="col-md-4">
+                        <div class="info-card ic-blue" style="padding:15px">
+                            <div><div class="card-label">Total Users</div><div class="card-value">${(users||[]).length}</div></div>
+                            <i class="fas fa-users card-icon"></i>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="info-card ic-green" style="padding:15px">
+                            <div><div class="card-label">Active Users</div><div class="card-value">${activeCount}</div></div>
+                            <i class="fas fa-check-circle card-icon"></i>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="info-card ic-yellow" style="padding:15px">
+                            <div><div class="card-label">Inactive Users</div><div class="card-value">${inactiveCount}</div></div>
+                            <i class="fas fa-ban card-icon"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i>
+                    <strong>User Management Guide:</strong>
+                    <ul class="mb-0 mt-2">
+                        <li><strong>Admin</strong> - Full system access. <span class="text-danger">Protected - Cannot be deactivated</span></li>
+                        <li><strong>Site Manager</strong> - Can only view/edit their assigned site. Can be deactivated/reactivated</li>
+                        <li><strong>Deactivated users</strong> - Cannot log in, but all their data remains intact</li>
+                        <li><strong>Registration Password:</strong> Set in database table <code>app_settings</code> with key 'registration_password'</li>
+                    </ul>
+                </div>
+                
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover">
+                        <thead class="table-primary">
+                            <tr>
+                                <th>Email</th>
+                                <th>Name</th>
+                                <th>Role</th>
+                                <th>Assigned Site</th>
+                                <th>Change Role</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>${userRows || '<table><td colspan="6" class="text-center text-muted">No users found</td>'}</tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    `;
 }
 
 async function updateUserRole(userId, role) {
-    await supabaseClient.from('profiles').update({ role }).eq('id', userId);
-    alert('Role updated successfully');
+    if (userId === currentUser.id) {
+        alert('You cannot change your own role!');
+        return;
+    }
+    
+    try {
+        const { error } = await supabaseClient
+            .from('profiles')
+            .update({ role })
+            .eq('id', userId);
+        
+        if (error) throw error;
+        alert('✅ Role updated successfully');
+        showAdminPanel();
+    } catch (error) {
+        console.error('Role update error:', error);
+        alert('Failed to update role: ' + error.message);
+    }
 }
 
 async function updateUserSite(userId, siteId) {
-    await supabaseClient.from('profiles').update({ assigned_site_id: siteId || null }).eq('id', userId);
-    alert('Site assignment updated');
+    try {
+        const { error } = await supabaseClient
+            .from('profiles')
+            .update({ assigned_site_id: siteId || null })
+            .eq('id', userId);
+        
+        if (error) throw error;
+        alert('✅ Site assignment updated successfully');
+        showAdminPanel();
+    } catch (error) {
+        console.error('Site update error:', error);
+        alert('Failed to update site: ' + error.message);
+    }
+}
+
+async function toggleUserStatus(userId, userEmail, isCurrentlyActive) {
+    const action = isCurrentlyActive ? 'deactivate' : 'activate';
+    const confirmMsg = isCurrentlyActive 
+        ? `⚠️ Are you sure you want to DEACTIVATE "${userEmail}"?\n\nThis user will NOT be able to log in until reactivated.\nAll their data will remain intact.\n\nThis action can be reversed.`
+        : `✅ Do you want to REACTIVATE "${userEmail}"?\n\nThey will be able to log in again with their existing password.`;
+    
+    if (!confirm(confirmMsg)) return;
+    
+    try {
+        const { error } = await supabaseClient
+            .from('profiles')
+            .update({ is_active: !isCurrentlyActive })
+            .eq('id', userId);
+        
+        if (error) throw error;
+        
+        const message = isCurrentlyActive 
+            ? `✅ User "${userEmail}" has been DEACTIVATED.\n\nThey cannot log in until reactivated.`
+            : `✅ User "${userEmail}" has been REACTIVATED.\n\nThey can now log in.`;
+        
+        alert(message);
+        showAdminPanel();
+    } catch (error) {
+        console.error('Status toggle error:', error);
+        alert(`Failed to ${action} user: ${error.message}`);
+    }
 }
 
 // ============= UTILITY FUNCTIONS =============
 function showProfile() { 
-    alert(`User: ${currentUser?.email}\nRole: ${currentUserProfile?.role}\nAssigned Site ID: ${currentUserProfile?.assigned_site_id || 'None'}\nFull Name: ${currentUserProfile?.full_name || 'Not set'}`);
+    const status = currentUserProfile?.is_active !== false ? 'Active' : 'Inactive';
+    alert(`📧 Email: ${currentUser?.email}\n👤 Role: ${currentUserProfile?.role === 'admin' ? 'Administrator' : 'Site Manager'}\n📍 Assigned Site ID: ${currentUserProfile?.assigned_site_id || 'None'}\n📛 Name: ${currentUserProfile?.full_name || 'Not set'}\n🔵 Status: ${status}`);
 }
 
 function showSettings() { 
-    alert('Settings - Coming soon in next version.\n\nFeatures planned:\n- Email notification preferences\n- Report customization\n- Currency settings\n- Date format settings');
+    alert('⚙️ Settings - Coming soon in next version.\n\n📋 Planned features:\n- Email notification preferences\n- Report customization\n- Currency settings (KES/USD)\n- Date format settings\n- Backup options');
 }
 
 function showAbout() { 
-    alert('Platinum Construction Management v5.0\n\nDeveloped by AVC Tech\n© 2025\n\nFeatures:\n- Role-Based Access Control\n- Real-time Dashboard\n- Material & Expense Tracking\n- Inventory Management\n- Employee Attendance & Payroll\n- Comprehensive Reporting\n- PDF Export & Email Scheduling\n\nContact: starjabu@gmail.com | +254 717 141 710');
+    alert('🏗️ PLATINUM CONSTRUCTION MANAGEMENT v5.0\n\n👨‍💻 Developed by AVC Tech\n📅 © 2025\n\n✨ FEATURES:\n✅ Role-Based Access Control (Admin/Site Manager)\n✅ Real-time Dashboard\n✅ Material & Expense Tracking\n✅ Inventory Management\n✅ Employee Attendance & Payroll\n✅ Comprehensive Reporting\n✅ PDF Export & Email Scheduling\n✅ User Management with Deactivate/Reactivate\n✅ Registration Lock for Security\n\n📞 Contact: starjabu@gmail.com\n📱 Phone: +254 717 141 710');
 }
 
 function showPrivacy() { 
-    alert('Privacy Policy\n\nYour data is encrypted and secured using Supabase Row Level Security. We do not share your data with third parties. All data is backed up daily.');
+    alert('🔒 PRIVACY POLICY\n\n• Your data is encrypted and secured\n• We do not share your data with third parties\n• All data is backed up daily\n• Deactivated user data is preserved for history\n• You can request data export at any time\n• Data retention: 7 years for compliance');
 }
 
 function showTerms() { 
-    alert('Terms of Service\n\nThis software is provided for construction management purposes. Users are responsible for data accuracy. AVC Tech provides ongoing support and updates.');
+    alert('📜 TERMS OF SERVICE\n\n• This software is for construction management purposes\n• Users are responsible for data accuracy\n• AVC Tech provides ongoing support and updates\n• Weekly backups are performed automatically\n• Support response time: 24-48 hours\n• Version updates are included in subscription');
 }
 
 // Initialize the application
