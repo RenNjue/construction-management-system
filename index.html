@@ -27,14 +27,11 @@
         .sidebar a { color: white; text-decoration: none; padding: 10px 20px; display: block; transition: 0.3s; cursor: pointer; }
         .sidebar a:hover { background: rgba(255,255,255,0.1); border-radius: 8px; margin: 0 10px; }
         .sidebar i { width: 24px; margin-right: 10px; }
+        .sidebar .hidden-menu { display: none; }
         .main-content { margin-left: 260px; margin-top: 56px; padding: 20px; }
         .footer { margin-left: 260px; padding: 15px 20px; background: white; border-top: 1px solid #dee2e6; font-size: 12px; color: #6c757d; text-align: center; }
-
-        /* ---- STAT CARDS (generic clickable) ---- */
-        .stat-card { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); margin-bottom: 20px; transition: transform 0.2s; cursor: pointer; }
+        .stat-card { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); margin-bottom: 20px; cursor: pointer; }
         .stat-card:hover { transform: translateY(-3px); }
-
-        /* ---- COLOURED TOP CARDS (like Laravel) ---- */
         .info-card {
             border-radius: 12px; padding: 22px 24px; color: white;
             box-shadow: 0 4px 12px rgba(0,0,0,0.15); margin-bottom: 20px;
@@ -51,8 +48,6 @@
         .ic-cyan   { background: linear-gradient(135deg, #17a2b8, #0e6679); }
         .ic-yellow { background: linear-gradient(135deg, #f5a623, #c8770a); }
         .ic-dark   { background: linear-gradient(135deg, #343a40, #111); }
-
-        /* ---- DASHBOARD QUICK-LINK CARDS ---- */
         .quick-card {
             background: white; border-radius: 12px; padding: 28px 16px 20px;
             text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.08);
@@ -62,13 +57,13 @@
         .quick-card .qc-icon { font-size: 2.4rem; margin-bottom: 12px; }
         .quick-card .qc-label { font-size: 15px; font-weight: 600; color: #333; margin-bottom: 10px; }
         .quick-card .btn { font-size: 12px; padding: 5px 18px; border-radius: 20px; }
-
         .login-container { max-width: 450px; margin: 100px auto; background: white; border-radius: 16px; padding: 30px; box-shadow: 0 10px 40px rgba(0,0,0,0.1); }
         .filter-bar { background: white; padding: 20px; border-radius: 12px; margin-bottom: 20px; }
         .table-responsive { max-height: 500px; overflow: auto; }
         .remember-me { display: flex; align-items: center; gap: 8px; margin-top: 10px; }
         .btn-sm { margin: 2px; }
         .modal-content { border-radius: 12px; }
+        .role-badge { background: rgba(255,255,255,0.2); padding: 4px 12px; border-radius: 20px; font-size: 12px; }
         @media (max-width: 768px) { .sidebar { width: 70px; } .sidebar span { display: none; } .main-content, .footer { margin-left: 70px; } }
     </style>
 </head>
@@ -82,10 +77,12 @@
             <div class="user-menu d-flex align-items-center" data-bs-toggle="dropdown">
                 <i class="fas fa-user-circle fa-2x me-2"></i>
                 <span id="userName">Account</span>
+                <span id="userRole" class="role-badge ms-2"></span>
                 <i class="fas fa-chevron-down ms-2 small"></i>
             </div>
             <ul class="dropdown-menu dropdown-menu-end">
                 <li><a class="dropdown-item" href="#" onclick="showProfile()"><i class="fas fa-user me-2"></i>Profile</a></li>
+                <li id="adminMenuItem" style="display:none;"><a class="dropdown-item" href="#" onclick="showAdminPanel()"><i class="fas fa-users-cog me-2"></i>Admin Panel</a></li>
                 <li><hr class="dropdown-divider"></li>
                 <li><a class="dropdown-item" href="#" onclick="showSettings()"><i class="fas fa-cog me-2"></i>Settings</a></li>
                 <li><a class="dropdown-item" href="#" onclick="showAbout()"><i class="fas fa-info-circle me-2"></i>About</a></li>
@@ -97,23 +94,23 @@
 </div>
 
 <!-- Sidebar -->
-<div class="sidebar">
+<div class="sidebar" id="sidebar">
     <div class="text-center p-3"><i class="fas fa-hard-hat fa-2x"></i></div>
     <div class="nav-section">Main Menu</div>
-    <a onclick="showPage('dashboard')"><i class="fas fa-tachometer-alt"></i> <span>Dashboard</span></a>
+    <a onclick="showPage('dashboard')" id="menuDashboard"><i class="fas fa-tachometer-alt"></i> <span>Dashboard</span></a>
     <div class="nav-section">Construction</div>
-    <a onclick="showPage('sites')"><i class="fas fa-map-marker-alt"></i> <span>Sites</span></a>
-    <a onclick="showPage('materialCategories')"><i class="fas fa-tags"></i> <span>Material Categories</span></a>
-    <a onclick="showPage('expenseCategories')"><i class="fas fa-receipt"></i> <span>Expense Categories</span></a>
-    <a onclick="showPage('materials')"><i class="fas fa-cubes"></i> <span>Materials</span></a>
-    <a onclick="showPage('expenses')"><i class="fas fa-money-bill-wave"></i> <span>Expenses</span></a>
-    <a onclick="showPage('inventory')"><i class="fas fa-boxes"></i> <span>Inventory</span></a>
+    <a onclick="showPage('sites')" id="menuSites"><i class="fas fa-map-marker-alt"></i> <span>Sites</span></a>
+    <a onclick="showPage('materialCategories')" id="menuMatCat"><i class="fas fa-tags"></i> <span>Material Categories</span></a>
+    <a onclick="showPage('expenseCategories')" id="menuExpCat"><i class="fas fa-receipt"></i> <span>Expense Categories</span></a>
+    <a onclick="showPage('materials')" id="menuMaterials"><i class="fas fa-cubes"></i> <span>Materials</span></a>
+    <a onclick="showPage('expenses')" id="menuExpenses"><i class="fas fa-money-bill-wave"></i> <span>Expenses</span></a>
+    <a onclick="showPage('inventory')" id="menuInventory"><i class="fas fa-boxes"></i> <span>Inventory</span></a>
     <div class="nav-section">Employees</div>
-    <a onclick="showPage('employees')"><i class="fas fa-users"></i> <span>Employees</span></a>
-    <a onclick="showPage('attendance')"><i class="fas fa-calendar-check"></i> <span>Daily Reporting</span></a>
-    <a onclick="showPage('pendingPayments')"><i class="fas fa-money-bill-wave"></i> <span>Pending Payments</span></a>
+    <a onclick="showPage('employees')" id="menuEmployees"><i class="fas fa-users"></i> <span>Employees</span></a>
+    <a onclick="showPage('attendance')" id="menuAttendance"><i class="fas fa-calendar-check"></i> <span>Daily Reporting</span></a>
+    <a onclick="showPage('pendingPayments')" id="menuPendingPayments"><i class="fas fa-money-bill-wave"></i> <span>Pending Payments</span></a>
     <div class="nav-section">Reports</div>
-    <a onclick="showPage('reports')"><i class="fas fa-chart-line"></i> <span>Reports Dashboard</span></a>
+    <a onclick="showPage('reports')" id="menuReports"><i class="fas fa-chart-line"></i> <span>Reports Dashboard</span></a>
 </div>
 
 <!-- Main Content -->
@@ -123,8 +120,8 @@
 
 <!-- Footer -->
 <div class="footer" id="footer" style="display: none;">
-    <p class="mb-0">&copy; 2025 AVC Tech. All rights reserved. | <a href="#" onclick="showPrivacy()">Privacy Policy</a> | <a href="#" onclick="showTerms()">Terms of Service</a><br>
-    Contact: starjabu@gmail.com | +254 717 141 710</p>
+    <p class="mb-0">&copy; 2026 Starjabu DSL. All rights reserved. | <a href="#" onclick="showPrivacy()">Privacy Policy</a> | <a href="#" onclick="showTerms()">Terms of Service</a><br>
+    Contact: starjabudsl@gmail.com | +254 717 141 710</p>
 </div>
 
 <!-- Login Screen -->
@@ -146,11 +143,12 @@
             <button class="btn btn-primary w-100 mt-3" onclick="doLogin()">Login</button>
         </div>
         <div class="tab-pane" id="registerTabContent">
+            <div class="mb-3"><label class="form-label">Registration Password</label><input type="password" id="regPasswordKey" class="form-control" placeholder="Enter registration password"></div>
             <div class="mb-3"><label class="form-label">Full Name</label><input type="text" id="regName" class="form-control"></div>
             <div class="mb-3"><label class="form-label">Email</label><input type="email" id="regEmail" class="form-control"></div>
             <div class="mb-3"><label class="form-label">Password</label><input type="password" id="regPassword" class="form-control"></div>
             <div class="mb-3"><label class="form-label">Confirm Password</label><input type="password" id="regConfirmPassword" class="form-control"></div>
-            <button class="btn btn-success w-100" onclick="doRegister()">Start Managing your projects</button>
+            <button class="btn btn-success w-100" onclick="doRegister()">Register</button>
         </div>
     </div>
 </div>
@@ -164,6 +162,7 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 
 let supabaseClient = null;
 let currentUser = null;
+let currentUserProfile = null;
 let currentPage = 'dashboard';
 
 // ============= INIT =============
@@ -172,10 +171,13 @@ async function initApp() {
     const { data: { session } } = await supabaseClient.auth.getSession();
     if (session && session.user) {
         currentUser = session.user;
+        await loadUserProfile();
         document.getElementById('loginScreen').style.display = 'none';
         document.getElementById('mainContent').style.display = 'block';
         document.getElementById('footer').style.display = 'block';
         document.getElementById('userName').innerText = currentUser.email.split('@')[0];
+        document.getElementById('userRole').innerText = currentUserProfile?.role === 'admin' ? 'Admin' : 'Site Manager';
+        updateSidebarVisibility();
         showPage('dashboard');
     } else {
         document.getElementById('loginScreen').style.display = 'block';
@@ -184,17 +186,61 @@ async function initApp() {
     }
 }
 
+async function loadUserProfile() {
+    if (!currentUser) return;
+    let { data } = await supabaseClient
+        .from('profiles')
+        .select('*')
+        .eq('id', currentUser.id)
+        .single();
+    
+    if (!data) {
+        const { data: newProfile } = await supabaseClient
+            .from('profiles')
+            .insert([{ 
+                id: currentUser.id, 
+                email: currentUser.email, 
+                full_name: currentUser.email.split('@')[0],
+                role: 'site_manager'
+            }])
+            .select()
+            .single();
+        data = newProfile;
+    }
+    currentUserProfile = data;
+}
+
 async function doRegister() {
+    const regPasswordKey = document.getElementById('regPasswordKey').value.trim();
     const name = document.getElementById('regName').value.trim();
     const email = document.getElementById('regEmail').value.trim();
     const password = document.getElementById('regPassword').value;
     const confirm = document.getElementById('regConfirmPassword').value;
+    
+    if (!regPasswordKey) { alert('Registration password is required'); return; }
     if (!name || !email) { alert('Please fill all fields'); return; }
     if (password !== confirm) { alert('Passwords do not match'); return; }
     if (password.length < 6) { alert('Password must be at least 6 characters'); return; }
-    const { error } = await supabaseClient.auth.signUp({ email, password, options: { data: { name } } });
+    
+    const { data: settings } = await supabaseClient
+        .from('app_settings')
+        .select('value')
+        .eq('key', 'registration_password')
+        .single();
+    
+    if (!settings || settings.value !== regPasswordKey) {
+        alert('Invalid registration password. Please contact your administrator.');
+        return;
+    }
+    
+    const { error } = await supabaseClient.auth.signUp({ 
+        email, 
+        password, 
+        options: { data: { name } } 
+    });
     if (error) { alert('Registration error: ' + error.message); return; }
     alert('Registration successful! Please check your email to confirm your account.');
+    document.getElementById('regPasswordKey').value = '';
     document.getElementById('regName').value = '';
     document.getElementById('regEmail').value = '';
     document.getElementById('regPassword').value = '';
@@ -209,19 +255,40 @@ async function doLogin() {
     const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
     if (error) { alert('Login failed: ' + error.message); return; }
     currentUser = data.user;
+    await loadUserProfile();
     document.getElementById('loginScreen').style.display = 'none';
     document.getElementById('mainContent').style.display = 'block';
     document.getElementById('footer').style.display = 'block';
     document.getElementById('userName').innerText = currentUser.email.split('@')[0];
+    document.getElementById('userRole').innerText = currentUserProfile?.role === 'admin' ? 'Admin' : 'Site Manager';
+    updateSidebarVisibility();
     showPage('dashboard');
 }
 
 async function logout() {
     await supabaseClient.auth.signOut();
     currentUser = null;
+    currentUserProfile = null;
     document.getElementById('loginScreen').style.display = 'block';
     document.getElementById('mainContent').style.display = 'none';
     document.getElementById('footer').style.display = 'none';
+}
+
+function updateSidebarVisibility() {
+    const isAdminUser = currentUserProfile?.role === 'admin';
+    document.getElementById('menuSites').style.display = isAdminUser ? 'block' : 'none';
+    document.getElementById('menuEmployees').style.display = isAdminUser ? 'block' : 'none';
+    document.getElementById('menuPendingPayments').style.display = isAdminUser ? 'block' : 'none';
+    document.getElementById('menuReports').style.display = isAdminUser ? 'block' : 'none';
+    document.getElementById('adminMenuItem').style.display = isAdminUser ? 'block' : 'none';
+}
+
+function isAdmin() {
+    return currentUserProfile?.role === 'admin';
+}
+
+function getUserAssignedSite() {
+    return currentUserProfile?.assigned_site_id;
 }
 
 // ============= HELPERS =============
@@ -230,24 +297,52 @@ function escapeHtml(str) {
     return str.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 }
 
-async function loadSiteOptions(selectId) {
-    const { data: sites } = await supabaseClient.from('sites').select('id, name');
+async function loadSiteOptions(selectId, filterByUserSite = false) {
+    let query = supabaseClient.from('sites').select('id, name');
+    if (filterByUserSite && !isAdmin() && getUserAssignedSite()) {
+        query = query.eq('id', getUserAssignedSite());
+    }
+    const { data: sites } = await query.order('name');
     const select = document.getElementById(selectId);
     if (select) select.innerHTML = '<option value="">Select Site</option>' + (sites || []).map(s => `<option value="${s.id}">${escapeHtml(s.name)}</option>`).join('');
     return sites || [];
 }
+
 async function loadCategoryOptions(selectId) {
-    const { data: cats } = await supabaseClient.from('categories').select('id, name');
+    const { data: cats } = await supabaseClient.from('categories').select('id, name').order('name');
     const select = document.getElementById(selectId);
     if (select) select.innerHTML = '<option value="">Select Category</option>' + (cats || []).map(c => `<option value="${c.id}">${escapeHtml(c.name)}</option>`).join('');
     return cats || [];
 }
+
+async function loadSectionOptions(selectId) {
+    const { data: sections } = await supabaseClient.from('material_sections').select('id, name').order('name');
+    const select = document.getElementById(selectId);
+    if (select) {
+        let html = '<option value="">Select Section (Optional)</option>';
+        (sections || []).forEach(s => html += `<option value="${s.id}">${escapeHtml(s.name)}</option>`);
+        select.innerHTML = html;
+    }
+    return sections || [];
+}
+
+async function quickAddSection() {
+    if (!isAdmin()) { alert('Only administrators can add new sections'); return; }
+    const name = prompt('New section name (e.g., Foundation, First Floor, Roofing, etc.):');
+    if (name) {
+        await supabaseClient.from('material_sections').insert([{ name }]);
+        await loadSectionOptions('materialSectionId');
+        alert(`Section "${name}" added successfully!`);
+    }
+}
+
 async function loadExpenseCategoryOptions(selectId) {
-    const { data: cats } = await supabaseClient.from('expense_categories').select('id, name');
+    const { data: cats } = await supabaseClient.from('expense_categories').select('id, name').order('name');
     const select = document.getElementById(selectId);
     if (select) select.innerHTML = '<option value="">Select Category</option>' + (cats || []).map(c => `<option value="${c.id}">${escapeHtml(c.name)}</option>`).join('');
     return cats || [];
 }
+
 async function loadSkillOptions(selectId) {
     const { data: skills } = await supabaseClient.from('skills').select('name');
     const select = document.getElementById(selectId);
@@ -264,20 +359,61 @@ async function showPage(page) {
     currentPage = page;
     document.getElementById('pageContent').innerHTML = '<div class="text-center py-5"><div class="spinner-border text-primary"></div><p>Loading...</p></div>';
     if (page === 'dashboard') await renderDashboard();
-    else if (page === 'sites') await renderSites();
+    else if (page === 'sites' && isAdmin()) await renderSites();
     else if (page === 'materialCategories') await renderMaterialCategories();
     else if (page === 'expenseCategories') await renderExpenseCategories();
     else if (page === 'materials') await renderMaterials();
     else if (page === 'expenses') await renderExpenses();
-    else if (page === 'employees') await renderEmployees();
+    else if (page === 'employees' && isAdmin()) await renderEmployees();
     else if (page === 'attendance') await renderAttendance();
-    else if (page === 'pendingPayments') await renderPendingPayments();
+    else if (page === 'pendingPayments' && isAdmin()) await renderPendingPayments();
     else if (page === 'inventory') await renderInventory();
-    else if (page === 'reports') await renderReports();
+    else if (page === 'reports' && isAdmin()) await renderReports();
+    else if (!isAdmin() && (page === 'sites' || page === 'employees' || page === 'pendingPayments' || page === 'reports')) {
+        showPage('dashboard');
+    }
 }
 
 // ============= DASHBOARD =============
 async function renderDashboard() {
+    const userSiteId = getUserAssignedSite();
+    
+    if (!isAdmin() && userSiteId) {
+        const [materialsR, expensesR, inventoryR, siteData] = await Promise.all([
+            supabaseClient.from('materials').select('*', { count: 'exact', head: true }).eq('site_id', userSiteId),
+            supabaseClient.from('expenses').select('amount').eq('site_id', userSiteId),
+            supabaseClient.from('inventory').select('*', { count: 'exact', head: true }).eq('current_site_id', userSiteId),
+            supabaseClient.from('sites').select('name').eq('id', userSiteId).single()
+        ]);
+        const materialsCount = materialsR.count;
+        const expenseTotal = (expensesR.data || []).reduce((s,e) => s+(e.amount||0), 0);
+        const inventoryCount = inventoryR.count;
+        const siteName = siteData?.name || 'Your Site';
+        
+            document.getElementById('pageContent').innerHTML = `
+        <div class="row mb-3">
+            <div class="col-12">
+                <div class="p-4 rounded-3 text-white mb-2" style="background:linear-gradient(135deg,#1d6fea,#0f172a)">
+                    <h4 class="mb-1">Welcome, ${currentUser.email.split('@')[0]}</h4>
+                    <p class="mb-0 opacity-75">Managing Site: ${escapeHtml(siteName)}</p>
+                    <p class="mb-0 opacity-75 mt-2"><i class="fas fa-info-circle me-1"></i>You have access to data entry only. Financial summaries are restricted.</p>
+                </div>
+            </div>
+        </div>
+        <div class="row g-3 mb-4">
+            <div class="col-md-6 col-6"><div class="info-card ic-blue"><div><div class="card-label">Materials Records</div><div class="card-value">${fmtInt(materialsCount)}</div></div><i class="fas fa-cubes card-icon"></i></div></div>
+            <div class="col-md-6 col-6"><div class="info-card ic-cyan"><div><div class="card-label">Inventory Items</div><div class="card-value">${fmtInt(inventoryCount)}</div></div><i class="fas fa-boxes card-icon"></i></div></div>
+        </div>
+        <div class="row g-3">
+            <div class="col-md-4 col-6"><div class="quick-card" onclick="showPage('materials')"><div class="qc-icon text-success"><i class="fas fa-cubes"></i></div><div class="qc-label">Materials</div><button class="btn btn-success btn-sm">Manage</button></div></div>
+            <div class="col-md-4 col-6"><div class="quick-card" onclick="showPage('expenses')"><div class="qc-icon text-danger"><i class="fas fa-money-bill-wave"></i></div><div class="qc-label">Expenses</div><button class="btn btn-danger btn-sm">Manage</button></div></div>
+            <div class="col-md-4 col-6"><div class="quick-card" onclick="showPage('inventory')"><div class="qc-icon text-info"><i class="fas fa-boxes"></i></div><div class="qc-label">Inventory</div><button class="btn btn-info btn-sm text-white">Manage</button></div></div>
+            <div class="col-md-4 col-6"><div class="quick-card" onclick="showPage('attendance')"><div class="qc-icon text-secondary"><i class="fas fa-calendar-check"></i></div><div class="qc-label">Daily Reporting</div><button class="btn btn-secondary btn-sm">Mark</button></div></div>
+        </div>`;
+        return;
+    }
+    
+    // Admin dashboard - full view
     const [sitesR, materialsR, expensesR, employeesR, inventoryR, pendingR, matCostR] = await Promise.all([
         supabaseClient.from('sites').select('*', { count: 'exact', head: true }),
         supabaseClient.from('materials').select('*', { count: 'exact', head: true }),
@@ -301,105 +437,28 @@ async function renderDashboard() {
             </div>
         </div>
         <div class="row g-3 mb-4">
-            <div class="col-md-3 col-6">
-                <div class="info-card ic-blue" onclick="showPage('sites')" style="cursor:pointer">
-                    <div><div class="card-label">Sites</div><div class="card-value">${fmtInt(sitesR.count)}</div></div>
-                    <i class="fas fa-map-marker-alt card-icon"></i>
-                </div>
-            </div>
-            <div class="col-md-3 col-6">
-                <div class="info-card ic-green" onclick="showPage('materials')" style="cursor:pointer">
-                    <div><div class="card-label">Materials</div><div class="card-value">${fmtInt(materialsR.count)}</div></div>
-                    <i class="fas fa-cubes card-icon"></i>
-                </div>
-            </div>
-            <div class="col-md-3 col-6">
-                <div class="info-card" style="background:linear-gradient(135deg,#6f42c1,#3d1a78);cursor:pointer" onclick="showPage('materials')">
-                    <div><div class="card-label">Materials Cost</div><div class="card-value">Ksh ${fmt(matCostTotal)}</div></div>
-                    <i class="fas fa-coins card-icon"></i>
-                </div>
-            </div>
-            <div class="col-md-3 col-6">
-                <div class="info-card ic-red" onclick="showPage('expenses')" style="cursor:pointer">
-                    <div><div class="card-label">Expenses</div><div class="card-value">Ksh ${fmt(expenseTotal)}</div></div>
-                    <i class="fas fa-money-bill-wave card-icon"></i>
-                </div>
-            </div>
-            <div class="col-md-3 col-6">
-                <div class="info-card ic-cyan" onclick="showPage('inventory')" style="cursor:pointer">
-                    <div><div class="card-label">Inventory</div><div class="card-value">${fmtInt(inventoryR.count)}</div></div>
-                    <i class="fas fa-boxes card-icon"></i>
-                </div>
-            </div>
-            <div class="col-md-3 col-6">
-                <div class="info-card ic-yellow" onclick="showPage('employees')" style="cursor:pointer">
-                    <div><div class="card-label">Employees</div><div class="card-value">${fmtInt(employeesR.count)}</div></div>
-                    <i class="fas fa-users card-icon"></i>
-                </div>
-            </div>
-            <div class="col-md-3 col-6">
-                <div class="info-card ic-dark" onclick="showPage('pendingPayments')" style="cursor:pointer">
-                    <div><div class="card-label">Pending Pay</div><div class="card-value">Ksh ${fmt(pendingTotal)}</div></div>
-                    <i class="fas fa-clock card-icon"></i>
-                </div>
-            </div>
+            <div class="col-md-3 col-6"><div class="info-card ic-blue" onclick="showPage('sites')" style="cursor:pointer"><div><div class="card-label">Sites</div><div class="card-value">${fmtInt(sitesR.count)}</div></div><i class="fas fa-map-marker-alt card-icon"></i></div></div>
+            <div class="col-md-3 col-6"><div class="info-card ic-green" onclick="showPage('materials')" style="cursor:pointer"><div><div class="card-label">Materials</div><div class="card-value">${fmtInt(materialsR.count)}</div></div><i class="fas fa-cubes card-icon"></i></div></div>
+            <div class="col-md-3 col-6"><div class="info-card" style="background:linear-gradient(135deg,#6f42c1,#3d1a78);cursor:pointer" onclick="showPage('materials')"><div><div class="card-label">Materials Cost</div><div class="card-value">Ksh ${fmt(matCostTotal)}</div></div><i class="fas fa-coins card-icon"></i></div></div>
+            <div class="col-md-3 col-6"><div class="info-card ic-red" onclick="showPage('expenses')" style="cursor:pointer"><div><div class="card-label">Expenses</div><div class="card-value">Ksh ${fmt(expenseTotal)}</div></div><i class="fas fa-money-bill-wave card-icon"></i></div></div>
+            <div class="col-md-3 col-6"><div class="info-card ic-cyan" onclick="showPage('inventory')" style="cursor:pointer"><div><div class="card-label">Inventory</div><div class="card-value">${fmtInt(inventoryR.count)}</div></div><i class="fas fa-boxes card-icon"></i></div></div>
+            <div class="col-md-3 col-6"><div class="info-card ic-yellow" onclick="showPage('employees')" style="cursor:pointer"><div><div class="card-label">Employees</div><div class="card-value">${fmtInt(employeesR.count)}</div></div><i class="fas fa-users card-icon"></i></div></div>
+            <div class="col-md-3 col-6"><div class="info-card ic-dark" onclick="showPage('pendingPayments')" style="cursor:pointer"><div><div class="card-label">Pending Pay</div><div class="card-value">Ksh ${fmt(pendingTotal)}</div></div><i class="fas fa-clock card-icon"></i></div></div>
         </div>
-
         <div class="row g-3">
-            <div class="col-md-3 col-6">
-                <div class="quick-card" onclick="showPage('sites')">
-                    <div class="qc-icon text-primary"><i class="fas fa-map-marker-alt"></i></div>
-                    <div class="qc-label">Sites</div>
-                    <button class="btn btn-primary btn-sm">Manage Sites</button>
-                </div>
-            </div>
-            <div class="col-md-3 col-6">
-                <div class="quick-card" onclick="showPage('materials')">
-                    <div class="qc-icon text-success"><i class="fas fa-cubes"></i></div>
-                    <div class="qc-label">Materials</div>
-                    <button class="btn btn-success btn-sm">Manage Materials</button>
-                </div>
-            </div>
-            <div class="col-md-3 col-6">
-                <div class="quick-card" onclick="showPage('expenses')">
-                    <div class="qc-icon text-danger"><i class="fas fa-money-bill-wave"></i></div>
-                    <div class="qc-label">Expenses</div>
-                    <button class="btn btn-danger btn-sm">Manage Expenses</button>
-                </div>
-            </div>
-            <div class="col-md-3 col-6">
-                <div class="quick-card" onclick="showPage('inventory')">
-                    <div class="qc-icon text-info"><i class="fas fa-boxes"></i></div>
-                    <div class="qc-label">Inventory</div>
-                    <button class="btn btn-info btn-sm text-white">Manage Inventory</button>
-                </div>
-            </div>
-            <div class="col-md-4 col-6">
-                <div class="quick-card" onclick="showPage('employees')">
-                    <div class="qc-icon text-warning"><i class="fas fa-users"></i></div>
-                    <div class="qc-label">Employees</div>
-                    <button class="btn btn-warning btn-sm">Manage Employees</button>
-                </div>
-            </div>
-            <div class="col-md-4 col-6">
-                <div class="quick-card" onclick="showPage('attendance')">
-                    <div class="qc-icon text-secondary"><i class="fas fa-calendar-check"></i></div>
-                    <div class="qc-label">Daily Reporting</div>
-                    <button class="btn btn-secondary btn-sm">Mark Attendance</button>
-                </div>
-            </div>
-            <div class="col-md-4 col-6">
-                <div class="quick-card" onclick="showPage('pendingPayments')">
-                    <div class="qc-icon" style="color:#28a745"><i class="fas fa-hand-holding-usd"></i></div>
-                    <div class="qc-label">Pending Payments</div>
-                    <button class="btn btn-sm" style="background:#28a745;color:white">Process Salary</button>
-                </div>
-            </div>
+            <div class="col-md-3 col-6"><div class="quick-card" onclick="showPage('sites')"><div class="qc-icon text-primary"><i class="fas fa-map-marker-alt"></i></div><div class="qc-label">Sites</div><button class="btn btn-primary btn-sm">Manage Sites</button></div></div>
+            <div class="col-md-3 col-6"><div class="quick-card" onclick="showPage('materials')"><div class="qc-icon text-success"><i class="fas fa-cubes"></i></div><div class="qc-label">Materials</div><button class="btn btn-success btn-sm">Manage Materials</button></div></div>
+            <div class="col-md-3 col-6"><div class="quick-card" onclick="showPage('expenses')"><div class="qc-icon text-danger"><i class="fas fa-money-bill-wave"></i></div><div class="qc-label">Expenses</div><button class="btn btn-danger btn-sm">Manage Expenses</button></div></div>
+            <div class="col-md-3 col-6"><div class="quick-card" onclick="showPage('inventory')"><div class="qc-icon text-info"><i class="fas fa-boxes"></i></div><div class="qc-label">Inventory</div><button class="btn btn-info btn-sm text-white">Manage Inventory</button></div></div>
+            <div class="col-md-4 col-6"><div class="quick-card" onclick="showPage('employees')"><div class="qc-icon text-warning"><i class="fas fa-users"></i></div><div class="qc-label">Employees</div><button class="btn btn-warning btn-sm">Manage Employees</button></div></div>
+            <div class="col-md-4 col-6"><div class="quick-card" onclick="showPage('attendance')"><div class="qc-icon text-secondary"><i class="fas fa-calendar-check"></i></div><div class="qc-label">Daily Reporting</div><button class="btn btn-secondary btn-sm">Mark Attendance</button></div></div>
+            <div class="col-md-4 col-6"><div class="quick-card" onclick="showPage('pendingPayments')"><div class="qc-icon" style="color:#28a745"><i class="fas fa-hand-holding-usd"></i></div><div class="qc-label">Pending Payments</div><button class="btn btn-sm" style="background:#28a745;color:white">Process Salary</button></div></div>
         </div>`;
 }
 
-// ============= SITES =============
+// ============= SITES (Admin Only) =============
 async function renderSites() {
+    if (!isAdmin()) { showPage('dashboard'); return; }
     const { data: sites } = await supabaseClient.from('sites').select('*').order('id');
     let rows = '';
     (sites || []).forEach((s, i) => {
@@ -408,37 +467,26 @@ async function renderSites() {
             <td>${escapeHtml(s.name)}</td>
             <td>${escapeHtml(s.location || '-')}</td>
             <td>${escapeHtml(s.description || '-')}</td>
-            <td>
-                <button class="btn btn-sm btn-warning" onclick="editSite(${s.id}, '${escapeHtml(s.name).replace(/'/g,"\\'")}', '${escapeHtml(s.location||'').replace(/'/g,"\\'")}', '${escapeHtml(s.description||'').replace(/'/g,"\\'")}')">Edit</button>
-                <button class="btn btn-sm btn-danger" onclick="deleteSite(${s.id})">Delete</button>
+            <td><button class="btn btn-sm btn-warning" onclick="editSite(${s.id}, '${escapeHtml(s.name).replace(/'/g,"\\'")}', '${escapeHtml(s.location||'').replace(/'/g,"\\'")}', '${escapeHtml(s.description||'').replace(/'/g,"\\'")}')">Edit</button>
+            <button class="btn btn-sm btn-danger" onclick="deleteSite(${s.id})">Delete</button>
             </td>
         </tr>`;
     });
     document.getElementById('pageContent').innerHTML = `
-        <div class="card">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <h5 class="mb-0">Sites</h5>
-                <button class="btn btn-primary btn-sm" onclick="showAddSiteModal()"><i class="fas fa-plus me-1"></i>Add Site</button>
-            </div>
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table table-bordered table-hover">
-                        <thead class="table-primary"><tr><th>#</th><th>Name</th><th>Location</th><th>Description</th><th>Actions</th></tr></thead>
-                        <tbody>${rows || '<tr><td colspan="5" class="text-center text-muted">No sites found</td></tr>'}</tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
+        <div class="card"><div class="card-header d-flex justify-content-between align-items-center"><h5 class="mb-0">Sites</h5>
+        <button class="btn btn-primary btn-sm" onclick="showAddSiteModal()"><i class="fas fa-plus me-1"></i>Add Site</button></div>
+        <div class="card-body"><div class="table-responsive"><table class="table table-bordered table-hover">
+        <thead class="table-primary"><tr><th>#</th><th>Name</th><th>Location</th><th>Description</th><th>Actions</th></tr></thead>
+        <tbody>${rows || '<tr><td colspan="5" class="text-center text-muted">No sites found</td>'}</tbody>
+        </table></div></div></div>
         <div class="modal fade" id="siteModal" tabindex="-1"><div class="modal-dialog"><div class="modal-content">
-            <div class="modal-header bg-primary text-white"><h5 class="modal-title" id="siteModalTitle">Add Site</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div>
-            <div class="modal-body">
-                <div class="mb-3"><label class="form-label">Site Name</label><input type="text" id="siteName" class="form-control"></div>
-                <div class="mb-3"><label class="form-label">Location</label><input type="text" id="siteLocation" class="form-control"></div>
-                <div class="mb-3"><label class="form-label">Description</label><textarea id="siteDescription" class="form-control" rows="2"></textarea></div>
-            </div>
-            <div class="modal-footer"><button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button><button class="btn btn-primary" id="siteModalSaveBtn" onclick="saveSite()">Save</button></div>
-        </div></div></div>`;
+        <div class="modal-header bg-primary text-white"><h5 class="modal-title" id="siteModalTitle">Add Site</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div>
+        <div class="modal-body"><div class="mb-3"><label class="form-label">Site Name</label><input type="text" id="siteName" class="form-control"></div>
+        <div class="mb-3"><label class="form-label">Location</label><input type="text" id="siteLocation" class="form-control"></div>
+        <div class="mb-3"><label class="form-label">Description</label><textarea id="siteDescription" class="form-control" rows="2"></textarea></div></div>
+        <div class="modal-footer"><button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button><button class="btn btn-primary" id="siteModalSaveBtn" onclick="saveSite()">Save</button></div></div></div></div>`;
 }
+
 let editingSiteId = null;
 function showAddSiteModal() {
     editingSiteId = null;
@@ -478,66 +526,68 @@ async function deleteSite(id) { if (confirm('Delete this site?')) { await supaba
 async function renderMaterialCategories() {
     const { data: cats } = await supabaseClient.from('categories').select('*').order('id');
     let rows = '';
-    (cats || []).forEach((c, i) => rows += `<tr>
-        <td>${i+1}</td><td>${escapeHtml(c.name)}</td>
-        <td><button class="btn btn-sm btn-warning" onclick="editCategory('${c.id}','${escapeHtml(c.name).replace(/'/g,"\\'")}')">Edit</button>
-            <button class="btn btn-sm btn-danger" onclick="deleteCategory('${c.id}')">Delete</button></td>
-    </tr>`);
+    (cats || []).forEach((c, i) => {
+        rows += `<tr>
+            <td>${i+1}</td>
+            <td>${escapeHtml(c.name)}</td>
+            <td>${isAdmin() ? `<button class="btn btn-sm btn-warning" onclick="editCategory('${c.id}','${escapeHtml(c.name).replace(/'/g,"\\'")}')">Edit</button>
+            <button class="btn btn-sm btn-danger" onclick="deleteCategory('${c.id}')">Delete</button>` : '<span class="text-muted">Read Only</span>'}</td>
+        </tr>`;
+    });
     document.getElementById('pageContent').innerHTML = `
-        <div class="card">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <h5 class="mb-0">Material Categories</h5>
-                <button class="btn btn-primary btn-sm" onclick="addCategory()"><i class="fas fa-plus me-1"></i>Add Category</button>
-            </div>
-            <div class="card-body"><table class="table table-bordered"><thead class="table-primary"><tr><th>#</th><th>Name</th><th>Actions</th></tr></thead>
-            <tbody>${rows || '<tr><td colspan="3" class="text-center text-muted">No categories</td></tr>'}</tbody></table></div>
-        </div>`;
+        <div class="card"><div class="card-header d-flex justify-content-between align-items-center"><h5 class="mb-0">Material Categories</h5>
+        ${isAdmin() ? `<button class="btn btn-primary btn-sm" onclick="addCategory()"><i class="fas fa-plus me-1"></i>Add Category</button>` : '<span class="text-muted">View Only</span>'}</div>
+        <div class="card-body"><table class="table table-bordered"><thead class="table-primary"><tr><th>#</th><th>Name</th><th>Actions</th></tr></thead>
+        <tbody>${rows || '<tr><td colspan="3" class="text-center text-muted">No categories</td>'}</tbody></table></div></div>`;
 }
-function addCategory() { const name = prompt('Category name:'); if (name) supabaseClient.from('categories').insert([{ name }]).then(() => showPage('materialCategories')); }
-async function editCategory(id, oldName) { const n = prompt('Edit category name:', oldName); if (n && n !== oldName) { await supabaseClient.from('categories').update({ name: n }).eq('id', id); showPage('materialCategories'); } }
-async function deleteCategory(id) { if (confirm('Delete this category?')) { await supabaseClient.from('categories').delete().eq('id', id); showPage('materialCategories'); } }
+function addCategory() { if (!isAdmin()) { alert('Only administrators can add categories'); return; } const name = prompt('Category name:'); if (name) supabaseClient.from('categories').insert([{ name }]).then(() => showPage('materialCategories')); }
+async function editCategory(id, oldName) { if (!isAdmin()) { alert('Only administrators can edit categories'); return; } const n = prompt('Edit category name:', oldName); if (n && n !== oldName) { await supabaseClient.from('categories').update({ name: n }).eq('id', id); showPage('materialCategories'); } }
+async function deleteCategory(id) { if (!isAdmin()) { alert('Only administrators can delete categories'); return; } if (confirm('Delete this category?')) { await supabaseClient.from('categories').delete().eq('id', id); showPage('materialCategories'); } }
 
 // ============= EXPENSE CATEGORIES =============
 async function renderExpenseCategories() {
     const { data: cats } = await supabaseClient.from('expense_categories').select('*').order('id');
     let rows = '';
-    (cats || []).forEach((c, i) => rows += `<tr>
-        <td>${i+1}</td><td>${escapeHtml(c.name)}</td>
-        <td><button class="btn btn-sm btn-warning" onclick="editExpenseCategory('${c.id}','${escapeHtml(c.name).replace(/'/g,"\\'")}')">Edit</button>
-            <button class="btn btn-sm btn-danger" onclick="deleteExpenseCategory('${c.id}')">Delete</button></td>
-    </tr>`);
+    (cats || []).forEach((c, i) => {
+        rows += `<tr>
+            <td>${i+1}</td>
+            <td>${escapeHtml(c.name)}</td>
+            <td>${isAdmin() ? `<button class="btn btn-sm btn-warning" onclick="editExpenseCategory('${c.id}','${escapeHtml(c.name).replace(/'/g,"\\'")}')">Edit</button>
+            <button class="btn btn-sm btn-danger" onclick="deleteExpenseCategory('${c.id}')">Delete</button>` : '<span class="text-muted">Read Only</span>'}</td>
+        </tr>`;
+    });
     document.getElementById('pageContent').innerHTML = `
-        <div class="card">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <h5 class="mb-0">Expense Categories</h5>
-                <button class="btn btn-primary btn-sm" onclick="addExpenseCategory()"><i class="fas fa-plus me-1"></i>Add Category</button>
-            </div>
-            <div class="card-body"><table class="table table-bordered"><thead class="table-primary"><tr><th>#</th><th>Name</th><th>Actions</th></tr></thead>
-            <tbody>${rows || '<tr><td colspan="3" class="text-center text-muted">No categories</td></tr>'}</tbody></table></div>
-        </div>`;
+        <div class="card"><div class="card-header d-flex justify-content-between align-items-center"><h5 class="mb-0">Expense Categories</h5>
+        ${isAdmin() ? `<button class="btn btn-primary btn-sm" onclick="addExpenseCategory()"><i class="fas fa-plus me-1"></i>Add Category</button>` : '<span class="text-muted">View Only</span>'}</div>
+        <div class="card-body"><table class="table table-bordered"><thead class="table-primary"><tr><th>#</th><th>Name</th><th>Actions</th></tr></thead>
+        <tbody>${rows || '<tr><td colspan="3" class="text-center text-muted">No categories</td>'}</tbody></table></div></div>`;
 }
-function addExpenseCategory() { const name = prompt('Category name:'); if (name) supabaseClient.from('expense_categories').insert([{ name }]).then(() => showPage('expenseCategories')); }
-async function editExpenseCategory(id, oldName) { const n = prompt('Edit expense category name:', oldName); if (n && n !== oldName) { await supabaseClient.from('expense_categories').update({ name: n }).eq('id', id); showPage('expenseCategories'); } }
-async function deleteExpenseCategory(id) { if (confirm('Delete this category?')) { await supabaseClient.from('expense_categories').delete().eq('id', id); showPage('expenseCategories'); } }
+function addExpenseCategory() { if (!isAdmin()) { alert('Only administrators can add expense categories'); return; } const name = prompt('Category name:'); if (name) supabaseClient.from('expense_categories').insert([{ name }]).then(() => showPage('expenseCategories')); }
+async function editExpenseCategory(id, oldName) { if (!isAdmin()) { alert('Only administrators can edit expense categories'); return; } const n = prompt('Edit expense category name:', oldName); if (n && n !== oldName) { await supabaseClient.from('expense_categories').update({ name: n }).eq('id', id); showPage('expenseCategories'); } }
+async function deleteExpenseCategory(id) { if (!isAdmin()) { alert('Only administrators can delete expense categories'); return; } if (confirm('Delete this category?')) { await supabaseClient.from('expense_categories').delete().eq('id', id); showPage('expenseCategories'); } }
 
 // ============= MATERIALS =============
 let editingMaterialId = null;
 async function renderMaterials() {
-    const [materials, sites, categories] = await Promise.all([
-        supabaseClient.from('materials').select('*').order('id'),
+    const userSiteId = getUserAssignedSite();
+    let query = supabaseClient.from('materials').select('*').order('id');
+    if (!isAdmin() && userSiteId) {
+        query = query.eq('site_id', userSiteId);
+    }
+    const [materials, sites, categories, sections] = await Promise.all([
+        query,
         supabaseClient.from('sites').select('id, name'),
-        supabaseClient.from('categories').select('id, name')
+        supabaseClient.from('categories').select('id, name'),
+        supabaseClient.from('material_sections').select('id, name')
     ]);
     const siteMap = Object.fromEntries((sites.data || []).map(s => [s.id, s.name]));
-    const catMap  = Object.fromEntries((categories.data || []).map(c => [c.id, c.name]));
+    const catMap = Object.fromEntries((categories.data || []).map(c => [c.id, c.name]));
+    const sectionMap = Object.fromEntries((sections.data || []).map(s => [s.id, s.name]));
     const mData = materials.data || [];
-
-    // Card stats
     const totalCost = mData.reduce((s, m) => s + (m.total_cost || 0), 0);
     const now = new Date(); const thisMonth = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
     const monthCost = mData.filter(m => (m.purchase_date||'').startsWith(thisMonth)).reduce((s,m)=>s+(m.total_cost||0),0);
     const matTypes = new Set(mData.map(m => m.category_id).filter(Boolean)).size;
-
     let rows = '', grandTotal = 0;
     mData.forEach((m, i) => {
         grandTotal += m.total_cost || 0;
@@ -546,60 +596,53 @@ async function renderMaterials() {
             <td>${escapeHtml(siteMap[m.site_id] || '-')}</td>
             <td>${escapeHtml(m.material_name)}</td>
             <td>${escapeHtml(catMap[m.category_id] || '-')}</td>
+            <td>${escapeHtml(sectionMap[m.section_id] || '-')}</td>
             <td>${(m.quantity||0).toLocaleString()} ${escapeHtml(m.unit||'pieces')}</td>
             <td>Ksh ${fmt(m.unit_cost)}</td>
             <td class="fw-bold">Ksh ${fmt(m.total_cost)}</td>
             <td>${m.purchase_date || '-'}</td>
             <td>${escapeHtml(m.supplier || '-')}</td>
-            <td>
-                <button class="btn btn-sm btn-warning" onclick="editMaterial('${m.id}')">Edit</button>
-                <button class="btn btn-sm btn-danger" onclick="deleteMaterial('${m.id}')">Delete</button>
+            <td><button class="btn btn-sm btn-warning" onclick="editMaterial('${m.id}')">Edit</button>
+            <button class="btn btn-sm btn-danger" onclick="deleteMaterial('${m.id}')">Delete</button>
             </td>
         </tr>`;
     });
-
+    const showTotals = isAdmin();
+      const showCards = isAdmin();
     document.getElementById('pageContent').innerHTML = `
+        ${showCards ? `
         <div class="row g-3 mb-4">
             <div class="col-md-3 col-6"><div class="info-card ic-blue"><div><div class="card-label">Total Purchases</div><div class="card-value">${fmtInt(mData.length)}</div></div><i class="fas fa-cubes card-icon"></i></div></div>
             <div class="col-md-3 col-6"><div class="info-card ic-green"><div><div class="card-label">Total Cost</div><div class="card-value">Ksh ${fmt(totalCost)}</div></div><i class="fas fa-coins card-icon"></i></div></div>
             <div class="col-md-3 col-6"><div class="info-card ic-cyan"><div><div class="card-label">This Month</div><div class="card-value">Ksh ${fmt(monthCost)}</div></div><i class="fas fa-calendar card-icon"></i></div></div>
             <div class="col-md-3 col-6"><div class="info-card ic-yellow"><div><div class="card-label">Material Types</div><div class="card-value">${matTypes}</div></div><i class="fas fa-tags card-icon"></i></div></div>
-        </div>
-        <div class="card">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <h5 class="mb-0">Materials Purchase Records</h5>
-                <button class="btn btn-primary btn-sm" onclick="showAddMaterialModal()"><i class="fas fa-plus me-1"></i>Add Material Purchase</button>
-            </div>
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table table-bordered table-hover">
-                        <thead class="table-primary"><tr><th>#</th><th>Site</th><th>Material</th><th>Category</th><th>Quantity</th><th>Unit Cost</th><th>Total Cost</th><th>Purchase Date</th><th>Supplier</th><th>Actions</th></tr></thead>
-                        <tbody>${rows || '<tr><td colspan="10" class="text-center text-muted">No materials found</td></tr>'}</tbody>
-                        <tfoot><tr class="table-secondary fw-bold"><td colspan="6" class="text-end">Grand Total:</td><td colspan="4">Ksh ${fmt(grandTotal)}</td></tr></tfoot>
-                    </table>
-                </div>
-            </div>
-        </div>
+        </div>` : ''}
+        <div class="card">...<div class="card-header d-flex justify-content-between align-items-center"><h5 class="mb-0">Materials Purchase Records</h5>
+        <button class="btn btn-primary btn-sm" onclick="showAddMaterialModal()"><i class="fas fa-plus me-1"></i>Add Material Purchase</button></div>
+        <div class="card-body"><div class="table-responsive"><table class="table table-bordered table-hover">
+        <thead class="table-primary"><tr><th>#</th><th>Site</th><th>Material</th><th>Category</th><th>Section</th><th>Quantity</th><th>Unit Cost</th><th>Total Cost</th><th>Purchase Date</th><th>Supplier</th><th>Actions</th></tr></thead>
+        <tbody>${rows || '<tr><td colspan="11" class="text-center text-muted">No materials found</td>'}</tbody>
+        ${showTotals ? `<tfoot><tr class="table-secondary fw-bold"><td colspan="7" class="text-end">Grand Total:</td><td colspan="4">Ksh ${fmt(grandTotal)}</td></tr></tfoot>` : ''}追赶</div></div></div>
         <div class="modal fade" id="materialModal" tabindex="-1"><div class="modal-dialog modal-lg"><div class="modal-content">
-            <div class="modal-header bg-primary text-white"><h5 class="modal-title" id="materialModalTitle">Add Material Purchase</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div>
-            <div class="modal-body">
-                <div class="row"><div class="col-md-6 mb-3"><label>Site</label><select id="materialSiteId" class="form-control"></select></div>
-                <div class="col-md-6 mb-3"><label>Category</label><div class="input-group"><select id="materialCategoryId" class="form-control"></select><button class="btn btn-outline-primary" onclick="quickAddCategory()">+ New</button></div></div></div>
-                <div class="mb-3"><label>Material Name</label><input type="text" id="materialName" class="form-control"></div>
-                <div class="row"><div class="col-md-4 mb-3"><label>Quantity</label><input type="number" step="0.01" id="materialQuantity" class="form-control"></div>
-                <div class="col-md-4 mb-3"><label>Unit</label><input type="text" id="materialUnit" class="form-control" placeholder="pieces"></div>
-                <div class="col-md-4 mb-3"><label>Unit Cost (Ksh)</label><input type="number" step="0.01" id="materialUnitCost" class="form-control"></div></div>
-                <div class="row"><div class="col-md-6 mb-3"><label>Purchase Date</label><input type="date" id="materialPurchaseDate" class="form-control"></div>
-                <div class="col-md-6 mb-3"><label>Supplier</label><input type="text" id="materialSupplier" class="form-control"></div></div>
-                <div class="mb-3"><label>Received By</label><input type="text" id="materialReceivedBy" class="form-control"></div>
-                <div class="mb-3"><label>Notes</label><textarea id="materialNotes" class="form-control" rows="2"></textarea></div>
-            </div>
-            <div class="modal-footer"><button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button><button class="btn btn-primary" id="materialSaveBtn" onclick="saveMaterial()">Save</button></div>
-        </div></div></div>`;
-    await loadSiteOptions('materialSiteId');
+        <div class="modal-header bg-primary text-white"><h5 class="modal-title" id="materialModalTitle">Add Material Purchase</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div>
+        <div class="modal-body"><div class="row"><div class="col-md-6 mb-3"><label>Site</label><select id="materialSiteId" class="form-control"></select></div>
+        <div class="col-md-6 mb-3"><label>Category</label><div class="input-group"><select id="materialCategoryId" class="form-control"></select>${isAdmin() ? `<button class="btn btn-outline-primary" onclick="quickAddCategory()">+ New</button>` : ''}</div></div></div>
+        <div class="row"><div class="col-md-6 mb-3"><label>Material Name</label><input type="text" id="materialName" class="form-control"></div>
+        <div class="col-md-6 mb-3"><label>Section</label><div class="input-group"><select id="materialSectionId" class="form-control"></select>${isAdmin() ? `<button class="btn btn-outline-primary" onclick="quickAddSection()">+ New</button>` : ''}</div>
+        <small class="text-muted">e.g., Foundation, First Floor, Roofing, etc.</small></div></div>
+        <div class="row"><div class="col-md-4 mb-3"><label>Quantity</label><input type="number" step="0.01" id="materialQuantity" class="form-control"></div>
+        <div class="col-md-4 mb-3"><label>Unit</label><input type="text" id="materialUnit" class="form-control" placeholder="pieces"></div>
+        <div class="col-md-4 mb-3"><label>Unit Cost (Ksh)</label><input type="number" step="0.01" id="materialUnitCost" class="form-control"></div></div>
+        <div class="row"><div class="col-md-6 mb-3"><label>Purchase Date</label><input type="date" id="materialPurchaseDate" class="form-control"></div>
+        <div class="col-md-6 mb-3"><label>Supplier</label><input type="text" id="materialSupplier" class="form-control"></div></div>
+        <div class="mb-3"><label>Received By</label><input type="text" id="materialReceivedBy" class="form-control"></div>
+        <div class="mb-3"><label>Notes</label><textarea id="materialNotes" class="form-control" rows="2"></textarea></div></div>
+        <div class="modal-footer"><button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button><button class="btn btn-primary" id="materialSaveBtn" onclick="saveMaterial()">Save</button></div></div></div></div>`;
+    await loadSiteOptions('materialSiteId', !isAdmin());
     await loadCategoryOptions('materialCategoryId');
+    await loadSectionOptions('materialSectionId');
 }
-async function quickAddCategory() { const name = prompt('New category name:'); if (name) { await supabaseClient.from('categories').insert([{ name }]); await loadCategoryOptions('materialCategoryId'); } }
+async function quickAddCategory() { if (!isAdmin()) { alert('Only administrators can add categories'); return; } const name = prompt('New category name:'); if (name) { await supabaseClient.from('categories').insert([{ name }]); await loadCategoryOptions('materialCategoryId'); } }
 function showAddMaterialModal() {
     editingMaterialId = null;
     document.getElementById('materialModalTitle').innerText = 'Add Material Purchase';
@@ -622,6 +665,7 @@ async function editMaterial(id) {
     editingMaterialId = id;
     document.getElementById('materialSiteId').value = data.site_id || '';
     document.getElementById('materialCategoryId').value = data.category_id || '';
+    document.getElementById('materialSectionId').value = data.section_id || '';
     document.getElementById('materialName').value = data.material_name || '';
     document.getElementById('materialQuantity').value = data.quantity || '';
     document.getElementById('materialUnit').value = data.unit || 'pieces';
@@ -642,29 +686,31 @@ async function updateMaterial() {
 }
 function getMaterialFormData() {
     const qty = parseFloat(document.getElementById('materialQuantity').value) || 0;
-    const uc  = parseFloat(document.getElementById('materialUnitCost').value) || 0;
-    return { site_id: parseInt(document.getElementById('materialSiteId').value)||null, category_id: parseInt(document.getElementById('materialCategoryId').value)||null, material_name: document.getElementById('materialName').value, quantity: qty, unit: document.getElementById('materialUnit').value||'pieces', unit_cost: uc, total_cost: qty*uc, purchase_date: document.getElementById('materialPurchaseDate').value, supplier: document.getElementById('materialSupplier').value, received_by: document.getElementById('materialReceivedBy').value, notes: document.getElementById('materialNotes').value };
+    const uc = parseFloat(document.getElementById('materialUnitCost').value) || 0;
+    return { site_id: parseInt(document.getElementById('materialSiteId').value)||null, category_id: parseInt(document.getElementById('materialCategoryId').value)||null, section_id: document.getElementById('materialSectionId').value ? parseInt(document.getElementById('materialSectionId').value) : null, material_name: document.getElementById('materialName').value, quantity: qty, unit: document.getElementById('materialUnit').value||'pieces', unit_cost: uc, total_cost: qty*uc, purchase_date: document.getElementById('materialPurchaseDate').value, supplier: document.getElementById('materialSupplier').value, received_by: document.getElementById('materialReceivedBy').value, notes: document.getElementById('materialNotes').value };
 }
 async function deleteMaterial(id) { if (confirm('Delete this material?')) { await supabaseClient.from('materials').delete().eq('id', id); showPage('materials'); } }
 
 // ============= EXPENSES =============
 let editingExpenseId = null;
 async function renderExpenses() {
+    const userSiteId = getUserAssignedSite();
+    let query = supabaseClient.from('expenses').select('*').order('id');
+    if (!isAdmin() && userSiteId) {
+        query = query.eq('site_id', userSiteId);
+    }
     const [expenses, sites, categories] = await Promise.all([
-        supabaseClient.from('expenses').select('*').order('id'),
+        query,
         supabaseClient.from('sites').select('id, name'),
         supabaseClient.from('expense_categories').select('id, name')
     ]);
     const siteMap = Object.fromEntries((sites.data || []).map(s => [s.id, s.name]));
-    const catMap  = Object.fromEntries((categories.data || []).map(c => [c.id, c.name]));
+    const catMap = Object.fromEntries((categories.data || []).map(c => [c.id, c.name]));
     const eData = expenses.data || [];
-
-    // Card stats
     const totalExp = eData.reduce((s,e) => s+(e.amount||0), 0);
     const now = new Date(); const thisMonth = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
     const monthExp = eData.filter(e => (e.expense_date||'').startsWith(thisMonth)).reduce((s,e)=>s+(e.amount||0),0);
     const catsUsed = new Set(eData.map(e => e.category_id).filter(Boolean)).size;
-
     let rows = '', grandTotal = 0;
     eData.forEach((e, i) => {
         grandTotal += e.amount || 0;
@@ -676,110 +722,66 @@ async function renderExpenses() {
             <td class="fw-bold">Ksh ${fmt(e.amount)}</td>
             <td>${e.expense_date || '-'}</td>
             <td>${escapeHtml(e.receipt_number || '-')}</td>
-            <td>
-                <button class="btn btn-sm btn-warning" onclick="editExpense('${e.id}')">Edit</button>
-                <button class="btn btn-sm btn-danger" onclick="deleteExpense('${e.id}')">Delete</button>
+            <td><button class="btn btn-sm btn-warning" onclick="editExpense('${e.id}')">Edit</button>
+            <button class="btn btn-sm btn-danger" onclick="deleteExpense('${e.id}')">Delete</button>
             </td>
         </tr>`;
     });
-
+    const showTotals = isAdmin();
+    const showCards = isAdmin();
     document.getElementById('pageContent').innerHTML = `
+        ${showCards ? `
         <div class="row g-3 mb-4">
             <div class="col-md-3 col-6"><div class="info-card ic-red"><div><div class="card-label">Total Expenses</div><div class="card-value">Ksh ${fmt(totalExp)}</div></div><i class="fas fa-money-bill-wave card-icon"></i></div></div>
             <div class="col-md-3 col-6"><div class="info-card ic-blue"><div><div class="card-label">Transaction Count</div><div class="card-value">${fmtInt(eData.length)}</div></div><i class="fas fa-list card-icon"></i></div></div>
             <div class="col-md-3 col-6"><div class="info-card ic-yellow"><div><div class="card-label">This Month</div><div class="card-value">Ksh ${fmt(monthExp)}</div></div><i class="fas fa-calendar card-icon"></i></div></div>
             <div class="col-md-3 col-6"><div class="info-card ic-cyan"><div><div class="card-label">Categories Used</div><div class="card-value">${catsUsed}</div></div><i class="fas fa-tags card-icon"></i></div></div>
-        </div>
-        <div class="card">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <h5 class="mb-0">Site Expenses</h5>
-                <button class="btn btn-primary btn-sm" onclick="showAddExpenseModal()"><i class="fas fa-plus me-1"></i>Add Expense</button>
-            </div>
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table table-bordered table-hover">
-                        <thead class="table-primary"><tr><th>#</th><th>Site</th><th>Category</th><th>Description</th><th>Amount (Ksh)</th><th>Expense Date</th><th>Receipt No.</th><th>Actions</th></tr></thead>
-                        <tbody>${rows || '<tr><td colspan="8" class="text-center text-muted">No expenses found</td></tr>'}</tbody>
-                        <tfoot><tr class="table-secondary fw-bold"><td colspan="4" class="text-end">Total Expenses:</td><td colspan="4">Ksh ${fmt(grandTotal)}</td></tr></tfoot>
-                    </table>
-                </div>
-            </div>
-        </div>
+        </div>` : ''}
+        <div class="card">...<div class="card-header d-flex justify-content-between align-items-center"><h5 class="mb-0">Site Expenses</h5>
+        <button class="btn btn-primary btn-sm" onclick="showAddExpenseModal()"><i class="fas fa-plus me-1"></i>Add Expense</button></div>
+        <div class="card-body"><div class="table-responsive"><table class="table table-bordered table-hover">
+        <thead class="table-primary"><tr><th>#</th><th>Site</th><th>Category</th><th>Description</th><th>Amount (Ksh)</th><th>Expense Date</th><th>Receipt No.</th><th>Actions</th><tr></thead>
+        <tbody>${rows || '<tr><td colspan="8" class="text-center text-muted">No expenses found</td>'}</tbody>
+        ${showTotals ? `<tfoot><tr class="table-secondary fw-bold"><td colspan="4" class="text-end">Total Expenses:</td><td colspan="4">Ksh ${fmt(grandTotal)}</td></tr></tfoot>` : ''}
+        </table></div></div></div>
         <div class="modal fade" id="expenseModal" tabindex="-1"><div class="modal-dialog"><div class="modal-content">
-            <div class="modal-header bg-primary text-white"><h5 class="modal-title" id="expenseModalTitle">Add Expense</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div>
-            <div class="modal-body">
-                <div class="mb-3"><label>Site</label><select id="expenseSiteId" class="form-control"></select></div>
-                <div class="mb-3"><label>Category</label><div class="input-group"><select id="expenseCategoryId" class="form-control"></select><button class="btn btn-outline-primary" onclick="quickAddExpenseCategory()">+ New</button></div></div>
-                <div class="mb-3"><label>Amount (Ksh)</label><input type="number" step="0.01" id="expenseAmount" class="form-control"></div>
-                <div class="mb-3"><label>Expense Date</label><input type="date" id="expenseDate" class="form-control"></div>
-                <div class="mb-3"><label>Description</label><textarea id="expenseDescription" class="form-control" rows="2"></textarea></div>
-                <div class="mb-3"><label>Receipt Number</label><input type="text" id="expenseReceipt" class="form-control"></div>
-            </div>
-            <div class="modal-footer"><button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button><button class="btn btn-primary" id="expenseSaveBtn" onclick="saveExpense()">Save</button></div>
-        </div></div></div>`;
-    await loadSiteOptions('expenseSiteId');
+        <div class="modal-header bg-primary text-white"><h5 class="modal-title" id="expenseModalTitle">Add Expense</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div>
+        <div class="modal-body"><div class="mb-3"><label>Site</label><select id="expenseSiteId" class="form-control"></select></div>
+        <div class="mb-3"><label>Category</label><div class="input-group"><select id="expenseCategoryId" class="form-control"></select>${isAdmin() ? `<button class="btn btn-outline-primary" onclick="quickAddExpenseCategory()">+ New</button>` : ''}</div></div>
+        <div class="mb-3"><label>Amount (Ksh)</label><input type="number" step="0.01" id="expenseAmount" class="form-control"></div>
+        <div class="mb-3"><label>Expense Date</label><input type="date" id="expenseDate" class="form-control"></div>
+        <div class="mb-3"><label>Description</label><textarea id="expenseDescription" class="form-control" rows="2"></textarea></div>
+        <div class="mb-3"><label>Receipt Number</label><input type="text" id="expenseReceipt" class="form-control"></div></div>
+        <div class="modal-footer"><button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button><button class="btn btn-primary" id="expenseSaveBtn" onclick="saveExpense()">Save</button></div></div></div></div>`;
+    await loadSiteOptions('expenseSiteId', !isAdmin());
     await loadExpenseCategoryOptions('expenseCategoryId');
 }
-async function quickAddExpenseCategory() { const name = prompt('New expense category:'); if (name) { await supabaseClient.from('expense_categories').insert([{ name }]); await loadExpenseCategoryOptions('expenseCategoryId'); } }
-function showAddExpenseModal() {
-    editingExpenseId = null;
-    document.getElementById('expenseModalTitle').innerText = 'Add Expense';
-    document.getElementById('expenseSaveBtn').setAttribute('onclick','saveExpense()');
-    ['expenseAmount','expenseDate','expenseDescription','expenseReceipt'].forEach(id => document.getElementById(id).value = '');
-    new bootstrap.Modal(document.getElementById('expenseModal')).show();
-}
-async function saveExpense() {
-    const d = getExpenseFormData();
-    if (!d.amount) { alert('Amount required'); return; }
-    await supabaseClient.from('expenses').insert([d]);
-    bootstrap.Modal.getInstance(document.getElementById('expenseModal')).hide();
-    showPage('expenses');
-}
-async function editExpense(id) {
-    const { data } = await supabaseClient.from('expenses').select('*').eq('id', id).single();
-    if (!data) return;
-    editingExpenseId = id;
-    document.getElementById('expenseSiteId').value = data.site_id || '';
-    document.getElementById('expenseCategoryId').value = data.category_id || '';
-    document.getElementById('expenseAmount').value = data.amount || '';
-    document.getElementById('expenseDate').value = data.expense_date || '';
-    document.getElementById('expenseDescription').value = data.description || '';
-    document.getElementById('expenseReceipt').value = data.receipt_number || '';
-    document.getElementById('expenseModalTitle').innerText = 'Edit Expense';
-    document.getElementById('expenseSaveBtn').setAttribute('onclick','updateExpense()');
-    new bootstrap.Modal(document.getElementById('expenseModal')).show();
-}
-async function updateExpense() {
-    const d = getExpenseFormData();
-    await supabaseClient.from('expenses').update(d).eq('id', editingExpenseId);
-    bootstrap.Modal.getInstance(document.getElementById('expenseModal')).hide();
-    showPage('expenses');
-}
-function getExpenseFormData() {
-    return { site_id: parseInt(document.getElementById('expenseSiteId').value)||null, category_id: parseInt(document.getElementById('expenseCategoryId').value)||null, amount: parseFloat(document.getElementById('expenseAmount').value)||0, expense_date: document.getElementById('expenseDate').value, description: document.getElementById('expenseDescription').value, receipt_number: document.getElementById('expenseReceipt').value };
-}
+async function quickAddExpenseCategory() { if (!isAdmin()) { alert('Only administrators can add expense categories'); return; } const name = prompt('New expense category:'); if (name) { await supabaseClient.from('expense_categories').insert([{ name }]); await loadExpenseCategoryOptions('expenseCategoryId'); } }
+function showAddExpenseModal() { editingExpenseId = null; document.getElementById('expenseModalTitle').innerText = 'Add Expense'; document.getElementById('expenseSaveBtn').setAttribute('onclick','saveExpense()'); ['expenseAmount','expenseDate','expenseDescription','expenseReceipt'].forEach(id => document.getElementById(id).value = ''); new bootstrap.Modal(document.getElementById('expenseModal')).show(); }
+async function saveExpense() { const d = getExpenseFormData(); if (!d.amount) { alert('Amount required'); return; } await supabaseClient.from('expenses').insert([d]); bootstrap.Modal.getInstance(document.getElementById('expenseModal')).hide(); showPage('expenses'); }
+async function editExpense(id) { const { data } = await supabaseClient.from('expenses').select('*').eq('id', id).single(); if (!data) return; editingExpenseId = id; document.getElementById('expenseSiteId').value = data.site_id || ''; document.getElementById('expenseCategoryId').value = data.category_id || ''; document.getElementById('expenseAmount').value = data.amount || ''; document.getElementById('expenseDate').value = data.expense_date || ''; document.getElementById('expenseDescription').value = data.description || ''; document.getElementById('expenseReceipt').value = data.receipt_number || ''; document.getElementById('expenseModalTitle').innerText = 'Edit Expense'; document.getElementById('expenseSaveBtn').setAttribute('onclick','updateExpense()'); new bootstrap.Modal(document.getElementById('expenseModal')).show(); }
+async function updateExpense() { const d = getExpenseFormData(); await supabaseClient.from('expenses').update(d).eq('id', editingExpenseId); bootstrap.Modal.getInstance(document.getElementById('expenseModal')).hide(); showPage('expenses'); }
+function getExpenseFormData() { return { site_id: parseInt(document.getElementById('expenseSiteId').value)||null, category_id: parseInt(document.getElementById('expenseCategoryId').value)||null, amount: parseFloat(document.getElementById('expenseAmount').value)||0, expense_date: document.getElementById('expenseDate').value, description: document.getElementById('expenseDescription').value, receipt_number: document.getElementById('expenseReceipt').value }; }
 async function deleteExpense(id) { if (confirm('Delete this expense?')) { await supabaseClient.from('expenses').delete().eq('id', id); showPage('expenses'); } }
 
-// ============= EMPLOYEES =============
+// ============= EMPLOYEES (Admin Only) =============
 let editingEmployeeId = null;
 async function renderEmployees() {
+    if (!isAdmin()) { showPage('dashboard'); return; }
     const [employees, sites] = await Promise.all([
         supabaseClient.from('employees').select('*').order('id'),
         supabaseClient.from('sites').select('id, name')
     ]);
     const siteMap = Object.fromEntries((sites.data || []).map(s => [s.id, s.name]));
     const empData = employees.data || [];
-
-    // Card stats
-    const totalEmp   = empData.length;
-    const activeEmp  = empData.filter(e => e.is_active).length;
-    const today      = new Date().toISOString().slice(0,10);
-    const todayAtt   = (await supabaseClient.from('attendance').select('id', {count:'exact',head:true}).eq('report_date', today)).count || 0;
-    const pendingR   = (await supabaseClient.from('attendance').select('daily_rate').eq('is_paid', false)).data || [];
+    const totalEmp = empData.length;
+    const activeEmp = empData.filter(e => e.is_active).length;
+    const today = new Date().toISOString().slice(0,10);
+    const todayAtt = (await supabaseClient.from('attendance').select('id', {count:'exact',head:true}).eq('report_date', today)).count || 0;
+    const pendingR = (await supabaseClient.from('attendance').select('daily_rate').eq('is_paid', false)).data || [];
     const pendingAmt = pendingR.reduce((s,a) => s+(a.daily_rate||0), 0);
-    const paidR      = (await supabaseClient.from('attendance').select('daily_rate').eq('is_paid', true)).data || [];
-    const paidAmt    = paidR.reduce((s,a) => s+(a.daily_rate||0), 0);
-
+    const paidR = (await supabaseClient.from('attendance').select('daily_rate').eq('is_paid', true)).data || [];
+    const paidAmt = paidR.reduce((s,a) => s+(a.daily_rate||0), 0);
     let rows = '';
     empData.forEach((e, i) => {
         rows += `<tr>
@@ -791,151 +793,65 @@ async function renderEmployees() {
             <td>Ksh ${fmt(e.daily_rate)}</td>
             <td>${escapeHtml(e.skills||'-')}</td>
             <td><span class="badge ${e.is_active?'bg-success':'bg-danger'}">${e.is_active?'Active':'Inactive'}</span></td>
-            <td>
-                <button class="btn btn-sm btn-info text-white" onclick="viewEmployee('${e.id}')">View</button>
-                <button class="btn btn-sm btn-warning" onclick="editEmployee('${e.id}')">Edit</button>
-                <button class="btn btn-sm btn-danger" onclick="deleteEmployee('${e.id}')">Delete</button>
+            <td><button class="btn btn-sm btn-info text-white" onclick="viewEmployee('${e.id}')">View</button>
+            <button class="btn btn-sm btn-warning" onclick="editEmployee('${e.id}')">Edit</button>
+            <button class="btn btn-sm btn-danger" onclick="deleteEmployee('${e.id}')">Delete</button>
             </td>
         </tr>`;
     });
-
     document.getElementById('pageContent').innerHTML = `
-        <div class="row g-3 mb-4">
-            <div class="col-md col-6"><div class="info-card ic-blue"><div><div class="card-label">Total Employees</div><div class="card-value">${totalEmp}</div></div><i class="fas fa-users card-icon"></i></div></div>
-            <div class="col-md col-6"><div class="info-card ic-green"><div><div class="card-label">Active Employees</div><div class="card-value">${activeEmp}</div></div><i class="fas fa-user-check card-icon"></i></div></div>
-            <div class="col-md col-6"><div class="info-card ic-cyan"><div><div class="card-label">Today's Attendance</div><div class="card-value">${todayAtt}</div></div><i class="fas fa-calendar-check card-icon"></i></div></div>
-            <div class="col-md col-6"><div class="info-card ic-yellow"><div><div class="card-label">Pending Payments</div><div class="card-value">Ksh ${fmt(pendingAmt)}</div></div><i class="fas fa-clock card-icon"></i></div></div>
-            <div class="col-md col-6"><div class="info-card ic-dark"><div><div class="card-label">Total Paid to Date</div><div class="card-value">Ksh ${fmt(paidAmt)}</div></div><i class="fas fa-money-check card-icon"></i></div></div>
-        </div>
-        <div class="card">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <h5 class="mb-0">Site Employees</h5>
-                <button class="btn btn-primary btn-sm" onclick="showAddEmployeeModal()"><i class="fas fa-plus me-1"></i>Register New Employee</button>
-            </div>
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table table-bordered table-hover">
-                        <thead class="table-primary"><tr><th>#</th><th>Names</th><th>ID Number</th><th>Phone</th><th>Site</th><th>Daily Rate</th><th>Skills</th><th>Status</th><th>Actions</th></tr></thead>
-                        <tbody>${rows || '<tr><td colspan="9" class="text-center text-muted">No employees found</td></tr>'}</tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
+        <div class="row g-3 mb-4"><div class="col-md col-6"><div class="info-card ic-blue"><div><div class="card-label">Total Employees</div><div class="card-value">${totalEmp}</div></div><i class="fas fa-users card-icon"></i></div></div>
+        <div class="col-md col-6"><div class="info-card ic-green"><div><div class="card-label">Active Employees</div><div class="card-value">${activeEmp}</div></div><i class="fas fa-user-check card-icon"></i></div></div>
+        <div class="col-md col-6"><div class="info-card ic-cyan"><div><div class="card-label">Today's Attendance</div><div class="card-value">${todayAtt}</div></div><i class="fas fa-calendar-check card-icon"></i></div></div>
+        <div class="col-md col-6"><div class="info-card ic-yellow"><div><div class="card-label">Pending Payments</div><div class="card-value">Ksh ${fmt(pendingAmt)}</div></div><i class="fas fa-clock card-icon"></i></div></div>
+        <div class="col-md col-6"><div class="info-card ic-dark"><div><div class="card-label">Total Paid to Date</div><div class="card-value">Ksh ${fmt(paidAmt)}</div></div><i class="fas fa-money-check card-icon"></i></div></div></div>
+        <div class="card"><div class="card-header d-flex justify-content-between align-items-center"><h5 class="mb-0">Site Employees</h5>
+        <button class="btn btn-primary btn-sm" onclick="showAddEmployeeModal()"><i class="fas fa-plus me-1"></i>Register New Employee</button></div>
+        <div class="card-body"><div class="table-responsive"><table class="table table-bordered table-hover">
+        <thead class="table-primary"><tr><th>#</th><th>Names</th><th>ID Number</th><th>Phone</th><th>Site</th><th>Daily Rate</th><th>Skills</th><th>Status</th><th>Actions</th></tr></thead>
+        <tbody>${rows || '<tr><td colspan="9" class="text-center text-muted">No employees found</td>'}</tbody>
+        </table></div></div></div>
         <div class="modal fade" id="employeeModal" tabindex="-1"><div class="modal-dialog"><div class="modal-content">
-            <div class="modal-header bg-primary text-white"><h5 class="modal-title" id="employeeModalTitle">Add Employee</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div>
-            <div class="modal-body">
-                <div class="mb-3"><label>Full Name</label><input type="text" id="employeeNames" class="form-control"></div>
-                <div class="mb-3"><label>ID Number</label><input type="text" id="employeeIdNumber" class="form-control"></div>
-                <div class="mb-3"><label>Phone Number</label><input type="text" id="employeePhone" class="form-control"></div>
-                <div class="mb-3"><label>Site</label><select id="employeeSiteId" class="form-control"></select></div>
-                <div class="mb-3"><label>Daily Rate (Ksh)</label><input type="number" step="0.01" id="employeeDailyRate" class="form-control"></div>
-                <div class="mb-3"><label>Skills</label><div class="input-group"><select id="employeeSkills" class="form-control"></select><button class="btn btn-outline-primary" onclick="quickAddSkill()">+ New</button></div></div>
-                <div class="mb-3"><label>Registration Date</label><input type="date" id="employeeRegDate" class="form-control"></div>
-            </div>
-            <div class="modal-footer"><button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button><button class="btn btn-primary" id="employeeSaveBtn" onclick="saveEmployee()">Save</button></div>
-        </div></div></div>`;
+        <div class="modal-header bg-primary text-white"><h5 class="modal-title" id="employeeModalTitle">Add Employee</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div>
+        <div class="modal-body"><div class="mb-3"><label>Full Name</label><input type="text" id="employeeNames" class="form-control"></div>
+        <div class="mb-3"><label>ID Number</label><input type="text" id="employeeIdNumber" class="form-control"></div>
+        <div class="mb-3"><label>Phone Number</label><input type="text" id="employeePhone" class="form-control"></div>
+        <div class="mb-3"><label>Site</label><select id="employeeSiteId" class="form-control"></select></div>
+        <div class="mb-3"><label>Daily Rate (Ksh)</label><input type="number" step="0.01" id="employeeDailyRate" class="form-control"></div>
+        <div class="mb-3"><label>Skills</label><div class="input-group"><select id="employeeSkills" class="form-control"></select><button class="btn btn-outline-primary" onclick="quickAddSkill()">+ New</button></div></div>
+        <div class="mb-3"><label>Registration Date</label><input type="date" id="employeeRegDate" class="form-control"></div></div>
+        <div class="modal-footer"><button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button><button class="btn btn-primary" id="employeeSaveBtn" onclick="saveEmployee()">Save</button></div></div></div></div>`;
     await loadSiteOptions('employeeSiteId');
     await loadSkillOptions('employeeSkills');
 }
 async function quickAddSkill() { const name = prompt('New skill name:'); if (name) { await supabaseClient.from('skills').insert([{ name }]); await loadSkillOptions('employeeSkills'); } }
-function showAddEmployeeModal() {
-    editingEmployeeId = null;
-    document.getElementById('employeeModalTitle').innerText = 'Add Employee';
-    document.getElementById('employeeSaveBtn').setAttribute('onclick','saveEmployee()');
-    ['employeeNames','employeeIdNumber','employeePhone','employeeRegDate'].forEach(id => document.getElementById(id).value = '');
-    document.getElementById('employeeDailyRate').value = '';
-    new bootstrap.Modal(document.getElementById('employeeModal')).show();
-}
-async function saveEmployee() {
-    const d = getEmployeeFormData();
-    if (!d.names || !d.id_number) { alert('Name and ID Number required'); return; }
-    await supabaseClient.from('employees').insert([{ ...d, is_active: true }]);
-    bootstrap.Modal.getInstance(document.getElementById('employeeModal')).hide();
-    showPage('employees');
-}
-async function editEmployee(id) {
-    const { data } = await supabaseClient.from('employees').select('*').eq('id', id).single();
-    if (!data) return;
-    editingEmployeeId = id;
-    document.getElementById('employeeNames').value = data.names || '';
-    document.getElementById('employeeIdNumber').value = data.id_number || '';
-    document.getElementById('employeePhone').value = data.phone_number || '';
-    document.getElementById('employeeSiteId').value = data.site_id || '';
-    document.getElementById('employeeDailyRate').value = data.daily_rate || '';
-    document.getElementById('employeeSkills').value = data.skills || '';
-    document.getElementById('employeeRegDate').value = data.reg_date || '';
-    document.getElementById('employeeModalTitle').innerText = 'Edit Employee';
-    document.getElementById('employeeSaveBtn').setAttribute('onclick','updateEmployee()');
-    new bootstrap.Modal(document.getElementById('employeeModal')).show();
-}
-async function updateEmployee() {
-    const d = getEmployeeFormData();
-    await supabaseClient.from('employees').update(d).eq('id', editingEmployeeId);
-    bootstrap.Modal.getInstance(document.getElementById('employeeModal')).hide();
-    showPage('employees');
-}
-function getEmployeeFormData() {
-    return { names: document.getElementById('employeeNames').value, id_number: document.getElementById('employeeIdNumber').value, phone_number: document.getElementById('employeePhone').value, site_id: parseInt(document.getElementById('employeeSiteId').value)||null, daily_rate: parseFloat(document.getElementById('employeeDailyRate').value)||0, skills: document.getElementById('employeeSkills').value, reg_date: document.getElementById('employeeRegDate').value };
-}
+function showAddEmployeeModal() { editingEmployeeId = null; document.getElementById('employeeModalTitle').innerText = 'Add Employee'; document.getElementById('employeeSaveBtn').setAttribute('onclick','saveEmployee()'); ['employeeNames','employeeIdNumber','employeePhone','employeeRegDate'].forEach(id => document.getElementById(id).value = ''); document.getElementById('employeeDailyRate').value = ''; new bootstrap.Modal(document.getElementById('employeeModal')).show(); }
+async function saveEmployee() { const d = getEmployeeFormData(); if (!d.names || !d.id_number) { alert('Name and ID Number required'); return; } await supabaseClient.from('employees').insert([{ ...d, is_active: true }]); bootstrap.Modal.getInstance(document.getElementById('employeeModal')).hide(); showPage('employees'); }
+async function editEmployee(id) { const { data } = await supabaseClient.from('employees').select('*').eq('id', id).single(); if (!data) return; editingEmployeeId = id; document.getElementById('employeeNames').value = data.names || ''; document.getElementById('employeeIdNumber').value = data.id_number || ''; document.getElementById('employeePhone').value = data.phone_number || ''; document.getElementById('employeeSiteId').value = data.site_id || ''; document.getElementById('employeeDailyRate').value = data.daily_rate || ''; document.getElementById('employeeSkills').value = data.skills || ''; document.getElementById('employeeRegDate').value = data.reg_date || ''; document.getElementById('employeeModalTitle').innerText = 'Edit Employee'; document.getElementById('employeeSaveBtn').setAttribute('onclick','updateEmployee()'); new bootstrap.Modal(document.getElementById('employeeModal')).show(); }
+async function updateEmployee() { const d = getEmployeeFormData(); await supabaseClient.from('employees').update(d).eq('id', editingEmployeeId); bootstrap.Modal.getInstance(document.getElementById('employeeModal')).hide(); showPage('employees'); }
+function getEmployeeFormData() { return { names: document.getElementById('employeeNames').value, id_number: document.getElementById('employeeIdNumber').value, phone_number: document.getElementById('employeePhone').value, site_id: parseInt(document.getElementById('employeeSiteId').value)||null, daily_rate: parseFloat(document.getElementById('employeeDailyRate').value)||0, skills: document.getElementById('employeeSkills').value, reg_date: document.getElementById('employeeRegDate').value }; }
 async function deleteEmployee(id) { if (confirm('Delete this employee?')) { await supabaseClient.from('employees').delete().eq('id', id); showPage('employees'); } }
-async function viewEmployee(id) {
-    const { data: e } = await supabaseClient.from('employees').select('*').eq('id', id).single();
-    if (!e) return;
-    const sites = (await supabaseClient.from('sites').select('id,name')).data || [];
-    const siteMap = Object.fromEntries(sites.map(s=>[s.id,s.name]));
-    const { data: att } = await supabaseClient.from('attendance').select('*').eq('employee_id', id).order('report_date', {ascending:false});
-    const attData = att || [];
-    const totalPaid   = attData.filter(a=>a.is_paid).reduce((s,a)=>s+(a.daily_rate||0),0);
-    const unpaidDays  = attData.filter(a=>!a.is_paid).length;
-    let attRows = attData.map(a=>`<tr><td>${a.report_date||'-'}</td><td>${escapeHtml(siteMap[e.site_id]||'-')}</td><td>Ksh ${fmt(a.daily_rate)}</td><td><span class="badge ${a.is_paid?'bg-success':'bg-warning'}">${a.is_paid?'Paid':'Unpaid'}</span></td><td>${escapeHtml(a.comments||'-')}</td></tr>`).join('');
-    document.getElementById('pageContent').innerHTML = `
-        <button class="btn btn-secondary btn-sm mb-3" onclick="showPage('employees')"><i class="fas fa-arrow-left me-1"></i>Back to Employees</button>
-        <div class="row g-3 mb-3">
-            <div class="col-md col-6"><div class="info-card ic-cyan"><div><div class="card-label">Total Paid</div><div class="card-value">Ksh ${fmt(totalPaid)}</div></div><i class="fas fa-money-check card-icon"></i></div></div>
-            <div class="col-md col-6"><div class="info-card ic-yellow"><div><div class="card-label">Unpaid Days</div><div class="card-value">${unpaidDays}</div></div><i class="fas fa-clock card-icon"></i></div></div>
-        </div>
-        <div class="row g-3">
-            <div class="col-md-4">
-                <div class="card h-100"><div class="card-header bg-primary text-white"><h6 class="mb-0">Employee Profile</h6></div>
-                <div class="card-body">
-                    <p><strong>Names:</strong> ${escapeHtml(e.names)}</p>
-                    <p><strong>ID Number:</strong> ${escapeHtml(e.id_number||'-')}</p>
-                    <p><strong>Phone:</strong> ${escapeHtml(e.phone_number||'-')}</p>
-                    <p><strong>Site:</strong> ${escapeHtml(siteMap[e.site_id]||'-')}</p>
-                    <p><strong>Daily Rate:</strong> Ksh ${fmt(e.daily_rate)}</p>
-                    <p><strong>Skills:</strong> ${escapeHtml(e.skills||'-')}</p>
-                    <p><strong>Status:</strong> <span class="badge ${e.is_active?'bg-success':'bg-danger'}">${e.is_active?'Active':'Inactive'}</span></p>
-                    <p><strong>Registered:</strong> ${e.reg_date||'-'}</p>
-                </div></div>
-            </div>
-            <div class="col-md-8">
-                <div class="card"><div class="card-header d-flex justify-content-between align-items-center"><h6 class="mb-0">Attendance History</h6>
-                    <button class="btn btn-success btn-sm" onclick="payAllUnpaid('${e.id}')">Pay Salary</button>
-                </div>
-                <div class="card-body p-0"><div class="table-responsive"><table class="table table-bordered mb-0">
-                    <thead class="table-primary"><tr><th>Date</th><th>Site</th><th>Daily Rate</th><th>Status</th><th>Comments</th></tr></thead>
-                    <tbody>${attRows || '<tr><td colspan="5" class="text-center text-muted">No attendance records</td></tr>'}</tbody>
-                </table></div></div></div>
-            </div>
-        </div>`;
-}
-async function payAllUnpaid(empId) {
-    if (!confirm('Mark all unpaid attendance as paid?')) return;
-    await supabaseClient.from('attendance').update({ is_paid: true }).eq('employee_id', empId).eq('is_paid', false);
-    viewEmployee(empId);
-}
+async function viewEmployee(id) { const { data: e } = await supabaseClient.from('employees').select('*').eq('id', id).single(); if (!e) return; const sites = (await supabaseClient.from('sites').select('id,name')).data || []; const siteMap = Object.fromEntries(sites.map(s=>[s.id,s.name])); const { data: att } = await supabaseClient.from('attendance').select('*').eq('employee_id', id).order('report_date', {ascending:false}); const attData = att || []; const totalPaid = attData.filter(a=>a.is_paid).reduce((s,a)=>s+(a.daily_rate||0),0); const unpaidDays = attData.filter(a=>!a.is_paid).length; let attRows = attData.map(a=>`<tr><td>${a.report_date||'-'}</td><td>${escapeHtml(siteMap[e.site_id]||'-')}</td><td>Ksh ${fmt(a.daily_rate)}</td><td><span class="badge ${a.is_paid?'bg-success':'bg-warning'}">${a.is_paid?'Paid':'Unpaid'}</span></td><td>${escapeHtml(a.comments||'-')}</td></tr>`).join(''); document.getElementById('pageContent').innerHTML = `<button class="btn btn-secondary btn-sm mb-3" onclick="showPage('employees')"><i class="fas fa-arrow-left me-1"></i>Back to Employees</button><div class="row g-3 mb-3"><div class="col-md col-6"><div class="info-card ic-cyan"><div><div class="card-label">Total Paid</div><div class="card-value">Ksh ${fmt(totalPaid)}</div></div><i class="fas fa-money-check card-icon"></i></div></div><div class="col-md col-6"><div class="info-card ic-yellow"><div><div class="card-label">Unpaid Days</div><div class="card-value">${unpaidDays}</div></div><i class="fas fa-clock card-icon"></i></div></div></div><div class="row g-3"><div class="col-md-4"><div class="card h-100"><div class="card-header bg-primary text-white"><h6 class="mb-0">Employee Profile</h6></div><div class="card-body"><p><strong>Names:</strong> ${escapeHtml(e.names)}</p><p><strong>ID Number:</strong> ${escapeHtml(e.id_number||'-')}</p><p><strong>Phone:</strong> ${escapeHtml(e.phone_number||'-')}</p><p><strong>Site:</strong> ${escapeHtml(siteMap[e.site_id]||'-')}</p><p><strong>Daily Rate:</strong> Ksh ${fmt(e.daily_rate)}</p><p><strong>Skills:</strong> ${escapeHtml(e.skills||'-')}</p><p><strong>Status:</strong> <span class="badge ${e.is_active?'bg-success':'bg-danger'}">${e.is_active?'Active':'Inactive'}</span></p><p><strong>Registered:</strong> ${e.reg_date||'-'}</p></div></div></div><div class="col-md-8"><div class="card"><div class="card-header d-flex justify-content-between align-items-center"><h6 class="mb-0">Attendance History</h6><button class="btn btn-success btn-sm" onclick="payAllUnpaid('${e.id}')">Pay Salary</button></div><div class="card-body p-0"><div class="table-responsive"><table class="table table-bordered mb-0"><thead class="table-primary"><tr><th>Date</th><th>Site</th><th>Daily Rate</th><th>Status</th><th>Comments</th></tr></thead><tbody>${attRows || '<tr><td colspan="5" class="text-center text-muted">No attendance records</td></tr>'}</tbody></table></div></div></div></div></div>`; }
+async function payAllUnpaid(empId) { if (!confirm('Mark all unpaid attendance as paid?')) return; await supabaseClient.from('attendance').update({ is_paid: true }).eq('employee_id', empId).eq('is_paid', false); viewEmployee(empId); }
 
 // ============= ATTENDANCE =============
 async function renderAttendance() {
+    const userSiteId = getUserAssignedSite();
+    let employeesQuery = supabaseClient.from('employees').select('id, names, daily_rate');
+    if (!isAdmin() && userSiteId) {
+        employeesQuery = employeesQuery.eq('site_id', userSiteId);
+    }
     const [attendance, employees] = await Promise.all([
         supabaseClient.from('attendance').select('*').order('report_date', {ascending:false}),
-        supabaseClient.from('employees').select('id, names, daily_rate')
+        employeesQuery
     ]);
     const empMap = Object.fromEntries((employees.data || []).map(e => [e.id, e]));
     let rows = '';
     (attendance.data || []).forEach((a, i) => {
+        if (!isAdmin() && userSiteId && empMap[a.employee_id]?.site_id !== userSiteId) return;
         rows += `<tr>
-            <td>${i+1}</td><td>${a.report_date||'-'}</td>
+            <td>${i+1}</td>
+            <td>${a.report_date||'-'}</td>
             <td>${escapeHtml(empMap[a.employee_id]?.names||'-')}</td>
             <td>Ksh ${fmt(a.daily_rate)}</td>
             <td><span class="badge ${a.is_paid?'bg-success':'bg-warning'}">${a.is_paid?'Paid':'Unpaid'}</span></td>
@@ -944,102 +860,52 @@ async function renderAttendance() {
         </tr>`;
     });
     document.getElementById('pageContent').innerHTML = `
-        <div class="card">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <h5 class="mb-0">Daily Attendance</h5>
-                <button class="btn btn-primary btn-sm" onclick="showAddAttendanceModal()"><i class="fas fa-plus me-1"></i>Mark Attendance</button>
-            </div>
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table table-bordered table-hover">
-                        <thead class="table-primary"><tr><th>#</th><th>Date</th><th>Employee</th><th>Daily Rate</th><th>Status</th><th>Comments</th><th>Actions</th></tr></thead>
-                        <tbody>${rows||'<tr><td colspan="7" class="text-center text-muted">No attendance records</td></tr>'}</tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
+        <div class="card"><div class="card-header d-flex justify-content-between align-items-center"><h5 class="mb-0">Daily Attendance</h5>
+        <button class="btn btn-primary btn-sm" onclick="showAddAttendanceModal()"><i class="fas fa-plus me-1"></i>Mark Attendance</button></div>
+        <div class="card-body"><div class="table-responsive"><table class="table table-bordered table-hover">
+        <thead class="table-primary"><tr><th>#</th><th>Date</th><th>Employee</th><th>Daily Rate</th><th>Status</th><th>Comments</th><th>Actions</th></tr></thead>
+        <tbody>${rows||'<tr><td colspan="7" class="text-center text-muted">No attendance records</td>'}</tbody>
+        </table></div></div></div>
         <div class="modal fade" id="attendanceModal" tabindex="-1"><div class="modal-dialog"><div class="modal-content">
-            <div class="modal-header bg-primary text-white"><h5 class="modal-title">Mark Attendance</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div>
-            <div class="modal-body">
-                <div class="mb-3"><label>Employee</label><select id="attendanceEmployeeId" class="form-control"></select></div>
-                <div class="mb-3"><label>Date</label><input type="date" id="attendanceDate" class="form-control" value="${new Date().toISOString().slice(0,10)}"></div>
-                <div class="mb-3"><label>Comments</label><textarea id="attendanceComments" class="form-control" rows="2"></textarea></div>
-            </div>
-            <div class="modal-footer"><button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button><button class="btn btn-primary" onclick="saveAttendance()">Save</button></div>
-        </div></div></div>`;
-    const { data: emps } = await supabaseClient.from('employees').select('id, names, daily_rate').eq('is_active', true);
-    document.getElementById('attendanceEmployeeId').innerHTML = '<option value="">Select Employee</option>' + (emps||[]).map(e=>`<option value="${e.id}">${escapeHtml(e.names)} (Ksh ${fmt(e.daily_rate)})</option>`).join('');
+        <div class="modal-header bg-primary text-white"><h5 class="modal-title">Mark Attendance</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div>
+        <div class="modal-body"><div class="mb-3"><label>Employee</label><select id="attendanceEmployeeId" class="form-control"></select></div>
+        <div class="mb-3"><label>Date</label><input type="date" id="attendanceDate" class="form-control" value="${new Date().toISOString().slice(0,10)}"></div>
+        <div class="mb-3"><label>Comments</label><textarea id="attendanceComments" class="form-control" rows="2"></textarea></div></div>
+        <div class="modal-footer"><button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button><button class="btn btn-primary" onclick="saveAttendance()">Save</button></div></div></div></div>`;
+    let emps = employees.data || [];
+    document.getElementById('attendanceEmployeeId').innerHTML = '<option value="">Select Employee</option>' + emps.map(e=>`<option value="${e.id}">${escapeHtml(e.names)} (Ksh ${fmt(e.daily_rate)})</option>`).join('');
 }
-async function saveAttendance() {
-    const empId = document.getElementById('attendanceEmployeeId').value;
-    if (!empId) { alert('Select an employee'); return; }
-    const emp = (await supabaseClient.from('employees').select('daily_rate').eq('id', empId).single()).data;
-    const d = { employee_id: parseInt(empId), report_date: document.getElementById('attendanceDate').value, daily_rate: emp?.daily_rate||0, is_paid: false, comments: document.getElementById('attendanceComments').value };
-    if (!d.report_date) { alert('Date required'); return; }
-    await supabaseClient.from('attendance').insert([d]);
-    bootstrap.Modal.getInstance(document.getElementById('attendanceModal')).hide();
-    showPage('attendance');
-}
+async function saveAttendance() { const empId = document.getElementById('attendanceEmployeeId').value; if (!empId) { alert('Select an employee'); return; } const emp = (await supabaseClient.from('employees').select('daily_rate').eq('id', empId).single()).data; const d = { employee_id: parseInt(empId), report_date: document.getElementById('attendanceDate').value, daily_rate: emp?.daily_rate||0, is_paid: false, comments: document.getElementById('attendanceComments').value }; if (!d.report_date) { alert('Date required'); return; } await supabaseClient.from('attendance').insert([d]); bootstrap.Modal.getInstance(document.getElementById('attendanceModal')).hide(); showPage('attendance'); }
 function showAddAttendanceModal() { new bootstrap.Modal(document.getElementById('attendanceModal')).show(); }
 async function deleteAttendance(id) { if (confirm('Delete this record?')) { await supabaseClient.from('attendance').delete().eq('id', id); showPage('attendance'); } }
 
-// ============= PENDING PAYMENTS =============
+// ============= PENDING PAYMENTS (Admin Only) =============
 async function renderPendingPayments() {
+    if (!isAdmin()) { showPage('dashboard'); return; }
     const { data: attendance } = await supabaseClient.from('attendance').select('*, employees(names)').eq('is_paid', false).order('report_date', {ascending:false});
     const empGroups = {};
-    (attendance||[]).forEach(a => {
-        const name = a.employees?.names || 'Unknown';
-        if (!empGroups[name]) empGroups[name] = { days: 0, total: 0, ids: [] };
-        empGroups[name].days++;
-        empGroups[name].total += a.daily_rate||0;
-        empGroups[name].ids.push(a.id);
-    });
+    (attendance||[]).forEach(a => { const name = a.employees?.names || 'Unknown'; if (!empGroups[name]) empGroups[name] = { days: 0, total: 0, ids: [] }; empGroups[name].days++; empGroups[name].total += a.daily_rate||0; empGroups[name].ids.push(a.id); });
     let rows = '', grandTotal = 0;
-    Object.entries(empGroups).forEach(([name, g], i) => {
-        grandTotal += g.total;
-        rows += `<tr>
-            <td>${i+1}</td><td>${escapeHtml(name)}</td>
-            <td>${g.days}</td>
-            <td class="fw-bold">Ksh ${fmt(g.total)}</td>
-            <td><button class="btn btn-sm btn-success" onclick="processGroupPayment(${JSON.stringify(g.ids).replace(/"/g,'&quot;')}, ${g.total}, '${escapeHtml(name)}')">Pay Now</button></td>
-        </tr>`;
-    });
-    document.getElementById('pageContent').innerHTML = `
-        <div class="row g-3 mb-4">
-            <div class="col-md-4"><div class="info-card ic-yellow"><div><div class="card-label">Total Pending</div><div class="card-value">Ksh ${fmt(grandTotal)}</div></div><i class="fas fa-clock card-icon"></i></div></div>
-            <div class="col-md-4"><div class="info-card ic-blue"><div><div class="card-label">Employees Owed</div><div class="card-value">${Object.keys(empGroups).length}</div></div><i class="fas fa-users card-icon"></i></div></div>
-        </div>
-        <div class="card">
-            <div class="card-header"><h5 class="mb-0">Pending Salary Payments</h5></div>
-            <div class="card-body">
-                <div class="table-responsive"><table class="table table-bordered table-hover">
-                    <thead class="table-primary"><tr><th>#</th><th>Employee</th><th>Unpaid Days</th><th>Amount Due</th><th>Action</th></tr></thead>
-                    <tbody>${rows||'<tr><td colspan="5" class="text-center text-muted">No pending payments</td></tr>'}</tbody>
-                    <tfoot><tr class="table-secondary fw-bold"><td colspan="3" class="text-end">Grand Total:</td><td colspan="2">Ksh ${fmt(grandTotal)}</td></tr></tfoot>
-                </table></div>
-            </div>
-        </div>`;
+    Object.entries(empGroups).forEach(([name, g], i) => { grandTotal += g.total; rows += `<tr><td>${i+1}</td><td>${escapeHtml(name)}</td><td>${g.days}</td><td class="fw-bold">Ksh ${fmt(g.total)}</td><td><button class="btn btn-sm btn-success" onclick="processGroupPayment(${JSON.stringify(g.ids).replace(/"/g,'&quot;')}, ${g.total}, '${escapeHtml(name)}')">Pay Now</button></td></tr>`; });
+    document.getElementById('pageContent').innerHTML = `<div class="row g-3 mb-4"><div class="col-md-4"><div class="info-card ic-yellow"><div><div class="card-label">Total Pending</div><div class="card-value">Ksh ${fmt(grandTotal)}</div></div><i class="fas fa-clock card-icon"></i></div></div><div class="col-md-4"><div class="info-card ic-blue"><div><div class="card-label">Employees Owed</div><div class="card-value">${Object.keys(empGroups).length}</div></div><i class="fas fa-users card-icon"></i></div></div></div>
+    <div class="card"><div class="card-header"><h5 class="mb-0">Pending Salary Payments</h5></div><div class="card-body"><div class="table-responsive"><table class="table table-bordered table-hover"><thead class="table-primary"><tr><th>#</th><th>Employee</th><th>Unpaid Days</th><th>Amount Due</th><th>Action</th></tr></thead><tbody>${rows||'<tr><td colspan="5" class="text-center text-muted">No pending payments</td>'}</tbody><tfoot><tr class="table-secondary fw-bold"><td colspan="3" class="text-end">Grand Total:</td><td colspan="2">Ksh ${fmt(grandTotal)}</td></tr></tfoot></table></div></div></div>`;
 }
-async function processGroupPayment(ids, amount, name) {
-    if (!confirm(`Process Ksh ${fmt(amount)} payment for ${name}?`)) return;
-    await supabaseClient.from('attendance').update({ is_paid: true }).in('id', ids);
-    showPage('pendingPayments');
-}
+async function processGroupPayment(ids, amount, name) { if (!confirm(`Process Ksh ${fmt(amount)} payment for ${name}?`)) return; await supabaseClient.from('attendance').update({ is_paid: true }).in('id', ids); showPage('pendingPayments'); }
 
 // ============= INVENTORY =============
 let editingInventoryId = null;
 async function renderInventory() {
-    const [inventory, sites] = await Promise.all([
-        supabaseClient.from('inventory').select('*').order('id'),
-        supabaseClient.from('sites').select('id, name')
-    ]);
+    const userSiteId = getUserAssignedSite();
+    let query = supabaseClient.from('inventory').select('*').order('id');
+    if (!isAdmin() && userSiteId) {
+        query = query.eq('current_site_id', userSiteId);
+    }
+    const [inventory, sites] = await Promise.all([query, supabaseClient.from('sites').select('id, name')]);
     const siteMap = Object.fromEntries((sites.data||[]).map(s=>[s.id,s.name]));
     const invData = inventory.data||[];
     const totalValue = invData.reduce((s,i)=>s+(i.purchase_cost||0),0);
-    const available  = invData.filter(i=>i.status==='available').length;
-    const transferred= invData.filter(i=>i.status==='transferred').length;
-    const damaged    = invData.filter(i=>i.status==='damaged'||i.status==='lost').length;
-
+    const available = invData.filter(i=>i.status==='available').length;
+    const damaged = invData.filter(i=>i.status==='damaged'||i.status==='lost').length;
     let rows = '';
     invData.forEach((i, idx) => {
         rows += `<tr>
@@ -1051,114 +917,58 @@ async function renderInventory() {
             <td>${i.quantity}</td>
             <td><span class="badge ${i.status==='available'?'bg-success':i.status==='transferred'?'bg-info':'bg-danger'}">${escapeHtml(i.status)}</span></td>
             <td>Ksh ${fmt(i.purchase_cost)}</td>
-            <td>
-                <button class="btn btn-sm btn-warning" onclick="editInventory('${i.id}')">Edit</button>
-                <button class="btn btn-sm btn-info text-white" onclick="transferInventory('${i.id}')">Transfer</button>
-                <button class="btn btn-sm btn-secondary" onclick="markDamaged('${i.id}')">Damaged</button>
-                <button class="btn btn-sm btn-dark" onclick="markLost('${i.id}')">Lost</button>
-                <button class="btn btn-sm btn-danger" onclick="deleteInventory('${i.id}')">Delete</button>
+            <td><button class="btn btn-sm btn-warning" onclick="editInventory('${i.id}')">Edit</button>
+            <button class="btn btn-sm btn-danger" onclick="deleteInventory('${i.id}')">Delete</button>
+            ${isAdmin() ? `<button class="btn btn-sm btn-info text-white" onclick="transferInventory('${i.id}')">Transfer</button>` : ''}
             </td>
         </tr>`;
     });
+        const showCards = isAdmin();
     document.getElementById('pageContent').innerHTML = `
+        ${showCards ? `
         <div class="row g-3 mb-4">
             <div class="col-md-3 col-6"><div class="info-card ic-cyan"><div><div class="card-label">Total Items</div><div class="card-value">${fmtInt(invData.length)}</div></div><i class="fas fa-boxes card-icon"></i></div></div>
             <div class="col-md-3 col-6"><div class="info-card ic-blue"><div><div class="card-label">Inventory Value</div><div class="card-value">Ksh ${fmt(totalValue)}</div></div><i class="fas fa-coins card-icon"></i></div></div>
             <div class="col-md-3 col-6"><div class="info-card ic-green"><div><div class="card-label">Available</div><div class="card-value">${available}</div></div><i class="fas fa-check-circle card-icon"></i></div></div>
             <div class="col-md-3 col-6"><div class="info-card ic-red"><div><div class="card-label">Damaged / Lost</div><div class="card-value">${damaged}</div></div><i class="fas fa-exclamation-triangle card-icon"></i></div></div>
-        </div>
-        <div class="card">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <h5 class="mb-0">Inventory</h5>
-                <button class="btn btn-primary btn-sm" onclick="showAddInventoryModal()"><i class="fas fa-plus me-1"></i>Add Inventory</button>
-            </div>
-            <div class="card-body">
-                <div class="table-responsive"><table class="table table-bordered table-hover">
-                    <thead class="table-primary"><tr><th>#</th><th>Item</th><th>Category</th><th>Serial</th><th>Site</th><th>Qty</th><th>Status</th><th>Cost</th><th>Actions</th></tr></thead>
-                    <tbody>${rows||'<tr><td colspan="9" class="text-center text-muted">No inventory items</td></tr>'}</tbody>
-                </table></div>
-            </div>
-        </div>
+        </div>` : ''}
+        <div class="card">...<div class="card-header d-flex justify-content-between align-items-center"><h5 class="mb-0">Inventory</h5><button class="btn btn-primary btn-sm" onclick="showAddInventoryModal()"><i class="fas fa-plus me-1"></i>Add Inventory</button></div>
+        <div class="card-body"><div class="table-responsive"><table class="table table-bordered table-hover">
+        <thead class="table-primary"><tr><th>#</th><th>Item</th><th>Category</th><th>Serial</th><th>Site</th><th>Qty</th><th>Status</th><th>Cost</th><th>Actions</th></tr></thead>
+        <tbody>${rows||'<tr><td colspan="9" class="text-center text-muted">No inventory items</td>'}</tbody>
+        </table></div></div></div>
         <div class="modal fade" id="inventoryModal" tabindex="-1"><div class="modal-dialog"><div class="modal-content">
-            <div class="modal-header bg-primary text-white"><h5 class="modal-title" id="inventoryModalTitle">Add Inventory Item</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div>
-            <div class="modal-body">
-                <div class="mb-3"><label>Item Name</label><input type="text" id="inventoryItemName" class="form-control"></div>
-                <div class="mb-3"><label>Category</label><input type="text" id="inventoryCategory" class="form-control" placeholder="e.g. Power Tools, Heavy Equipment"></div>
-                <div class="mb-3"><label>Serial Number</label><input type="text" id="inventorySerial" class="form-control"></div>
-                <div class="mb-3"><label>Current Site</label><select id="inventorySiteId" class="form-control"></select></div>
-                <div class="row"><div class="col-md-6 mb-3"><label>Purchase Date</label><input type="date" id="inventoryPurchaseDate" class="form-control"></div>
-                <div class="col-md-6 mb-3"><label>Purchase Cost (Ksh)</label><input type="number" step="0.01" id="inventoryCost" class="form-control"></div></div>
-                <div class="mb-3"><label>Quantity</label><input type="number" id="inventoryQuantity" class="form-control" value="1"></div>
-                <div class="mb-3"><label>Notes</label><textarea id="inventoryNotes" class="form-control" rows="2"></textarea></div>
-            </div>
-            <div class="modal-footer"><button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button><button class="btn btn-primary" id="inventorySaveBtn" onclick="saveInventory()">Save</button></div>
-        </div></div></div>`;
-    await loadSiteOptions('inventorySiteId');
+        <div class="modal-header bg-primary text-white"><h5 class="modal-title" id="inventoryModalTitle">Add Inventory Item</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div>
+        <div class="modal-body"><div class="mb-3"><label>Item Name</label><input type="text" id="inventoryItemName" class="form-control"></div>
+        <div class="mb-3"><label>Category</label><input type="text" id="inventoryCategory" class="form-control" placeholder="e.g. Power Tools, Heavy Equipment"></div>
+        <div class="mb-3"><label>Serial Number</label><input type="text" id="inventorySerial" class="form-control"></div>
+        <div class="mb-3"><label>Current Site</label><select id="inventorySiteId" class="form-control"></select></div>
+        <div class="row"><div class="col-md-6 mb-3"><label>Purchase Date</label><input type="date" id="inventoryPurchaseDate" class="form-control"></div>
+        <div class="col-md-6 mb-3"><label>Purchase Cost (Ksh)</label><input type="number" step="0.01" id="inventoryCost" class="form-control"></div></div>
+        <div class="mb-3"><label>Quantity</label><input type="number" id="inventoryQuantity" class="form-control" value="1"></div>
+        <div class="mb-3"><label>Notes</label><textarea id="inventoryNotes" class="form-control" rows="2"></textarea></div></div>
+        <div class="modal-footer"><button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button><button class="btn btn-primary" id="inventorySaveBtn" onclick="saveInventory()">Save</button></div></div></div></div>`;
+    await loadSiteOptions('inventorySiteId', !isAdmin());
 }
-function showAddInventoryModal() {
-    editingInventoryId = null;
-    document.getElementById('inventoryModalTitle').innerText = 'Add Inventory Item';
-    document.getElementById('inventorySaveBtn').setAttribute('onclick','saveInventory()');
-    ['inventoryItemName','inventoryCategory','inventorySerial','inventoryNotes'].forEach(id=>document.getElementById(id).value='');
-    document.getElementById('inventoryCost').value=''; document.getElementById('inventoryPurchaseDate').value=''; document.getElementById('inventoryQuantity').value=1;
-    new bootstrap.Modal(document.getElementById('inventoryModal')).show();
-}
-async function saveInventory() {
-    const d = getInventoryFormData();
-    if (!d.item_name) { alert('Item name required'); return; }
-    await supabaseClient.from('inventory').insert([{ ...d, status: 'available' }]);
-    bootstrap.Modal.getInstance(document.getElementById('inventoryModal')).hide();
-    showPage('inventory');
-}
-async function editInventory(id) {
-    const { data } = await supabaseClient.from('inventory').select('*').eq('id', id).single();
-    if (!data) return;
-    editingInventoryId = id;
-    document.getElementById('inventoryItemName').value = data.item_name||'';
-    document.getElementById('inventoryCategory').value = data.category||'';
-    document.getElementById('inventorySerial').value = data.serial_number||'';
-    document.getElementById('inventorySiteId').value = data.current_site_id||'';
-    document.getElementById('inventoryPurchaseDate').value = data.purchase_date||'';
-    document.getElementById('inventoryCost').value = data.purchase_cost||'';
-    document.getElementById('inventoryQuantity').value = data.quantity||1;
-    document.getElementById('inventoryNotes').value = data.notes||'';
-    document.getElementById('inventoryModalTitle').innerText = 'Edit Inventory Item';
-    document.getElementById('inventorySaveBtn').setAttribute('onclick','updateInventory()');
-    new bootstrap.Modal(document.getElementById('inventoryModal')).show();
-}
-async function updateInventory() {
-    const d = getInventoryFormData();
-    await supabaseClient.from('inventory').update(d).eq('id', editingInventoryId);
-    bootstrap.Modal.getInstance(document.getElementById('inventoryModal')).hide();
-    showPage('inventory');
-}
-function getInventoryFormData() {
-    return { item_name: document.getElementById('inventoryItemName').value, category: document.getElementById('inventoryCategory').value, serial_number: document.getElementById('inventorySerial').value, current_site_id: parseInt(document.getElementById('inventorySiteId').value)||null, purchase_date: document.getElementById('inventoryPurchaseDate').value, purchase_cost: parseFloat(document.getElementById('inventoryCost').value)||0, quantity: parseInt(document.getElementById('inventoryQuantity').value)||1, notes: document.getElementById('inventoryNotes').value };
-}
-async function transferInventory(id) {
-    const sites = (await supabaseClient.from('sites').select('id, name')).data||[];
-    const opts = sites.map(s=>`${s.id}. ${s.name}`).join('\n');
-    const newSiteId = parseInt(prompt('Transfer to Site ID:\n'+opts));
-    if (newSiteId) { await supabaseClient.from('inventory').update({ current_site_id: newSiteId, status: 'transferred' }).eq('id', id); showPage('inventory'); }
-}
-async function markDamaged(id) { if (confirm('Mark as damaged?')) { await supabaseClient.from('inventory').update({ status: 'damaged' }).eq('id', id); showPage('inventory'); } }
-async function markLost(id)    { if (confirm('Mark as lost?'))    { await supabaseClient.from('inventory').update({ status: 'lost' }).eq('id', id); showPage('inventory'); } }
+function showAddInventoryModal() { editingInventoryId = null; document.getElementById('inventoryModalTitle').innerText = 'Add Inventory Item'; document.getElementById('inventorySaveBtn').setAttribute('onclick','saveInventory()'); ['inventoryItemName','inventoryCategory','inventorySerial','inventoryNotes'].forEach(id=>document.getElementById(id).value=''); document.getElementById('inventoryCost').value=''; document.getElementById('inventoryPurchaseDate').value=''; document.getElementById('inventoryQuantity').value=1; new bootstrap.Modal(document.getElementById('inventoryModal')).show(); }
+async function saveInventory() { const d = getInventoryFormData(); if (!d.item_name) { alert('Item name required'); return; } await supabaseClient.from('inventory').insert([{ ...d, status: 'available' }]); bootstrap.Modal.getInstance(document.getElementById('inventoryModal')).hide(); showPage('inventory'); }
+async function editInventory(id) { const { data } = await supabaseClient.from('inventory').select('*').eq('id', id).single(); if (!data) return; editingInventoryId = id; document.getElementById('inventoryItemName').value = data.item_name||''; document.getElementById('inventoryCategory').value = data.category||''; document.getElementById('inventorySerial').value = data.serial_number||''; document.getElementById('inventorySiteId').value = data.current_site_id||''; document.getElementById('inventoryPurchaseDate').value = data.purchase_date||''; document.getElementById('inventoryCost').value = data.purchase_cost||''; document.getElementById('inventoryQuantity').value = data.quantity||1; document.getElementById('inventoryNotes').value = data.notes||''; document.getElementById('inventoryModalTitle').innerText = 'Edit Inventory Item'; document.getElementById('inventorySaveBtn').setAttribute('onclick','updateInventory()'); new bootstrap.Modal(document.getElementById('inventoryModal')).show(); }
+async function updateInventory() { const d = getInventoryFormData(); await supabaseClient.from('inventory').update(d).eq('id', editingInventoryId); bootstrap.Modal.getInstance(document.getElementById('inventoryModal')).hide(); showPage('inventory'); }
+function getInventoryFormData() { return { item_name: document.getElementById('inventoryItemName').value, category: document.getElementById('inventoryCategory').value, serial_number: document.getElementById('inventorySerial').value, current_site_id: parseInt(document.getElementById('inventorySiteId').value)||null, purchase_date: document.getElementById('inventoryPurchaseDate').value, purchase_cost: parseFloat(document.getElementById('inventoryCost').value)||0, quantity: parseInt(document.getElementById('inventoryQuantity').value)||1, notes: document.getElementById('inventoryNotes').value }; }
+async function transferInventory(id) { if (!isAdmin()) { alert('Only administrators can transfer inventory'); return; } const sites = (await supabaseClient.from('sites').select('id, name')).data||[]; const opts = sites.map(s=>`${s.id}. ${s.name}`).join('\n'); const newSiteId = parseInt(prompt('Transfer to Site ID:\n'+opts)); if (newSiteId) { await supabaseClient.from('inventory').update({ current_site_id: newSiteId, status: 'transferred' }).eq('id', id); showPage('inventory'); } }
 async function deleteInventory(id) { if (confirm('Delete this item?')) { await supabaseClient.from('inventory').delete().eq('id', id); showPage('inventory'); } }
 
-// ============= REPORTS =============
-// Holds raw data so filters can re-render without re-fetching
+// ============= REPORTS (Full Dashboard) =============
 let _reportRawMaterials = [];
-let _reportRawExpenses  = [];
+let _reportRawExpenses = [];
 let _reportRawInventory = [];
-let _reportSiteList     = [];
-let _reportMatCatList   = [];
-let _reportExpCatList   = [];
-let _reportMatCats      = {};
-let _reportExpCats      = {};
-let _reportSiteMap      = {};
+let _reportSiteList = [];
+let _reportMatCatList = [];
+let _reportExpCatList = [];
 
 async function renderReports(filters) {
-    // On first load (no filters), fetch everything fresh
+    if (!isAdmin()) { showPage('dashboard'); return; }
+    
     if (!filters) {
         const [materials, expenses, sites, categories, expCats, inventoryR, attendanceR] = await Promise.all([
             supabaseClient.from('materials').select('*, sites(name), categories(name)'),
@@ -1170,43 +980,32 @@ async function renderReports(filters) {
             supabaseClient.from('attendance').select('daily_rate, is_paid')
         ]);
         _reportRawMaterials = materials.data || [];
-        _reportRawExpenses  = expenses.data  || [];
+        _reportRawExpenses = expenses.data || [];
         _reportRawInventory = inventoryR.data || [];
-        _reportSiteList     = sites.data || [];
-        _reportMatCatList   = categories.data || [];
-        _reportExpCatList   = expCats.data || [];
-        _reportMatCats      = Object.fromEntries((categories.data||[]).map(c=>[c.id,c.name]));
-        _reportExpCats      = Object.fromEntries((expCats.data||[]).map(c=>[c.id,c.name]));
-        _reportSiteMap      = Object.fromEntries((sites.data||[]).map(s=>[s.id,s.name]));
-        window._reportInvValue  = _reportRawInventory.reduce((s,i)=>s+(i.purchase_cost||0),0);
-        window._reportWagesPaid = (attendanceR.data||[]).filter(a=>a.is_paid).reduce((s,a)=>s+(a.daily_rate||0),0);
+        _reportSiteList = sites.data || [];
+        _reportMatCatList = categories.data || [];
+        _reportExpCatList = expCats.data || [];
+        window._reportWagesPaid = (attendanceR.data || []).filter(a=>a.is_paid).reduce((s,a)=>s+(a.daily_rate||0),0);
+        window._reportInvValue = _reportRawInventory.reduce((s,i)=>s+(i.purchase_cost||0),0);
     }
 
-    // Read all filter values
-    const fSite    = filters?.site    || 'all';
-    const fFrom    = filters?.from    || '';
-    const fTo      = filters?.to      || '';
-    const fSearch  = (filters?.search || '').toLowerCase().trim();
-    const fType    = filters?.type    || 'all';
-    const fMatCat  = filters?.matCat  || 'all';
-    const fExpCat  = filters?.expCat  || 'all';
-    const fSupplier= (filters?.supplier||'').toLowerCase().trim();
-    const fInvStatus=filters?.invStatus||'all';
-    const fMinAmt  = filters?.minAmt  ? parseFloat(filters.minAmt) : null;
-    const fMaxAmt  = filters?.maxAmt  ? parseFloat(filters.maxAmt) : null;
+    const fSite = filters?.site || 'all';
+    const fFrom = filters?.from || '';
+    const fTo = filters?.to || '';
+    const fSearch = (filters?.search || '').toLowerCase().trim();
+    const fType = filters?.type || 'all';
+    const fMatCat = filters?.matCat || 'all';
+    const fExpCat = filters?.expCat || 'all';
+    const fSupplier = (filters?.supplier||'').toLowerCase().trim();
+    const fInvStatus = filters?.invStatus||'all';
+    const fMinAmt = filters?.minAmt ? parseFloat(filters.minAmt) : null;
+    const fMaxAmt = filters?.maxAmt ? parseFloat(filters.maxAmt) : null;
 
-    function inDateRange(dateStr) {
-        if (!dateStr) return !fFrom && !fTo ? true : false;
-        if (fFrom && dateStr < fFrom) return false;
-        if (fTo   && dateStr > fTo)   return false;
-        return true;
-    }
-    // Allow no-date records through when no date filter set
     function inDateRangeOpt(dateStr) {
         if (!fFrom && !fTo) return true;
         if (!dateStr) return false;
         if (fFrom && dateStr < fFrom) return false;
-        if (fTo   && dateStr > fTo)   return false;
+        if (fTo && dateStr > fTo) return false;
         return true;
     }
     function matchesSite(siteName) { return fSite === 'all' || siteName === fSite; }
@@ -1218,8 +1017,7 @@ async function renderReports(filters) {
         if (fSupplier && !(m.supplier||'').toLowerCase().includes(fSupplier)) return false;
         if (fMinAmt !== null && (m.total_cost||0) < fMinAmt) return false;
         if (fMaxAmt !== null && (m.total_cost||0) > fMaxAmt) return false;
-        if (fSearch && ![m.material_name, m.supplier, m.received_by, m.notes, m.categories?.name]
-            .some(v => (v||'').toLowerCase().includes(fSearch))) return false;
+        if (fSearch && ![m.material_name, m.supplier, m.received_by, m.notes, m.categories?.name].some(v => (v||'').toLowerCase().includes(fSearch))) return false;
         return true;
     });
     let eData = _reportRawExpenses.filter(e => {
@@ -1228,30 +1026,27 @@ async function renderReports(filters) {
         if (fExpCat !== 'all' && (e.expense_categories?.name||'') !== fExpCat) return false;
         if (fMinAmt !== null && (e.amount||0) < fMinAmt) return false;
         if (fMaxAmt !== null && (e.amount||0) > fMaxAmt) return false;
-        if (fSearch && ![e.description, e.receipt_number, e.expense_categories?.name]
-            .some(v => (v||'').toLowerCase().includes(fSearch))) return false;
+        if (fSearch && ![e.description, e.receipt_number, e.expense_categories?.name].some(v => (v||'').toLowerCase().includes(fSearch))) return false;
         return true;
     });
     let iData = _reportRawInventory.filter(i => {
         if (!matchesSite(i.sites?.name)) return false;
         if (!inDateRangeOpt(i.purchase_date)) return false;
         if (fInvStatus !== 'all' && i.status !== fInvStatus) return false;
-        if (fSearch && ![i.item_name, i.category, i.serial_number, i.notes]
-            .some(v => (v||'').toLowerCase().includes(fSearch))) return false;
+        if (fSearch && ![i.item_name, i.category, i.serial_number, i.notes].some(v => (v||'').toLowerCase().includes(fSearch))) return false;
         return true;
     });
 
     const showMat = fType === 'all' || fType === 'materials';
     const showExp = fType === 'all' || fType === 'expenses';
     const showInv = fType === 'all' || fType === 'inventory';
-
-    const totalMat  = mData.reduce((s,m)=>s+(m.total_cost||0),0);
-    const totalExp  = eData.reduce((s,e)=>s+(e.amount||0),0);
-    const invValue  = window._reportInvValue || 0;
+    const totalMat = mData.reduce((s,m)=>s+(m.total_cost||0),0);
+    const totalExp = eData.reduce((s,e)=>s+(e.amount||0),0);
+    const invValue = window._reportInvValue || 0;
     const wagesPaid = window._reportWagesPaid || 0;
 
     const topMaterials = [...mData].sort((a,b)=>(b.total_cost||0)-(a.total_cost||0)).slice(0,5);
-    const expByCat  = {}; eData.forEach(e=>{ const n=e.expense_categories?.name||'Other'; expByCat[n]=(expByCat[n]||0)+(e.amount||0); });
+    const expByCat = {}; eData.forEach(e=>{ const n=e.expense_categories?.name||'Other'; expByCat[n]=(expByCat[n]||0)+(e.amount||0); });
     const matBySite = {}; mData.forEach(m=>{ const n=m.sites?.name; if(n) matBySite[n]=(matBySite[n]||0)+(m.total_cost||0); });
 
     const siteTotals = {};
@@ -1259,61 +1054,20 @@ async function renderReports(filters) {
     eData.forEach(e=>{ if(e.sites?.name){ if(!siteTotals[e.sites.name]) siteTotals[e.sites.name]={mat:0,exp:0}; siteTotals[e.sites.name].exp+=(e.amount||0); }});
     let siteRows = Object.entries(siteTotals).map(([site,v],i)=>`<tr><td>${i+1}</td><td>${escapeHtml(site)}</td><td>Ksh ${fmt(v.mat)}</td><td>Ksh ${fmt(v.exp)}</td><td class="fw-bold">Ksh ${fmt(v.mat+v.exp)}</td></tr>`).join('');
 
-    let matRows = mData.map((m,i)=>`<tr>
-        <td>${i+1}</td><td>${escapeHtml(m.sites?.name||'-')}</td><td>${escapeHtml(m.material_name)}</td>
-        <td>${escapeHtml(m.categories?.name||'-')}</td><td>${(m.quantity||0)} ${escapeHtml(m.unit||'')}</td>
-        <td>Ksh ${fmt(m.unit_cost)}</td><td class="fw-bold">Ksh ${fmt(m.total_cost)}</td>
-        <td>${m.purchase_date||'-'}</td><td>${escapeHtml(m.supplier||'-')}</td>
-    </tr>`).join('');
+    let matRows = mData.map((m,i)=>`<tr><td>${i+1}</td><td>${escapeHtml(m.sites?.name||'-')}</td><td>${escapeHtml(m.material_name)}</td><td>${escapeHtml(m.categories?.name||'-')}</td><td>${(m.quantity||0)} ${escapeHtml(m.unit||'')}</td><td>Ksh ${fmt(m.unit_cost)}</td><td class="fw-bold">Ksh ${fmt(m.total_cost)}</td><td>${m.purchase_date||'-'}</td><td>${escapeHtml(m.supplier||'-')}</td></tr>`).join('');
+    let expRows = eData.map((e,i)=>`<tr><td>${i+1}</td><td>${escapeHtml(e.sites?.name||'-')}</td><td>${escapeHtml(e.expense_categories?.name||'-')}</td><td>${escapeHtml(e.description||'-')}</td><td class="fw-bold">Ksh ${fmt(e.amount)}</td><td>${e.expense_date||'-'}</td><td>${escapeHtml(e.receipt_number||'-')}</td></tr>`).join('');
+    let invRows = iData.map((i,idx)=>`<tr><td>${idx+1}</td><td>${escapeHtml(i.item_name)}</td><td>${escapeHtml(i.category||'-')}</td><td>${escapeHtml(i.serial_number||'-')}</td><td>${escapeHtml(i.sites?.name||'-')}</td><td>${i.quantity}</td><td><span class="badge ${i.status==='available'?'bg-success':i.status==='transferred'?'bg-info':'bg-danger'}">${escapeHtml(i.status)}</span></td><td>Ksh ${fmt(i.purchase_cost)}</td><td>${i.purchase_date||'-'}</td></tr>`).join('');
 
-    let expRows = eData.map((e,i)=>`<tr>
-        <td>${i+1}</td><td>${escapeHtml(e.sites?.name||'-')}</td>
-        <td>${escapeHtml(e.expense_categories?.name||'-')}</td><td>${escapeHtml(e.description||'-')}</td>
-        <td class="fw-bold">Ksh ${fmt(e.amount)}</td><td>${e.expense_date||'-'}</td>
-        <td>${escapeHtml(e.receipt_number||'-')}</td>
-    </tr>`).join('');
-
-    let invRows = iData.map((i,idx)=>`<tr>
-        <td>${idx+1}</td><td>${escapeHtml(i.item_name)}</td><td>${escapeHtml(i.category||'-')}</td>
-        <td>${escapeHtml(i.serial_number||'-')}</td><td>${escapeHtml(i.sites?.name||'-')}</td>
-        <td>${i.quantity}</td><td><span class="badge ${i.status==='available'?'bg-success':i.status==='transferred'?'bg-info':'bg-danger'}">${escapeHtml(i.status)}</span></td>
-        <td>Ksh ${fmt(i.purchase_cost)}</td><td>${i.purchase_date||'-'}</td>
-    </tr>`).join('');
-
-    // Build active filter summary tags
-    const activeTags = [];
-    if (fType!=='all') activeTags.push(`<span class="badge bg-primary me-1">Type: ${fType}</span>`);
-    if (fSite!=='all') activeTags.push(`<span class="badge bg-primary me-1">Site: ${escapeHtml(fSite)}</span>`);
-    if (fFrom) activeTags.push(`<span class="badge bg-secondary me-1">From: ${fFrom}</span>`);
-    if (fTo)   activeTags.push(`<span class="badge bg-secondary me-1">To: ${fTo}</span>`);
-    if (fMatCat!=='all') activeTags.push(`<span class="badge bg-success me-1">Mat.Cat: ${escapeHtml(fMatCat)}</span>`);
-    if (fExpCat!=='all') activeTags.push(`<span class="badge bg-warning text-dark me-1">Exp.Cat: ${escapeHtml(fExpCat)}</span>`);
-    if (fSupplier) activeTags.push(`<span class="badge bg-info text-dark me-1">Supplier: ${escapeHtml(fSupplier)}</span>`);
-    if (fInvStatus!=='all') activeTags.push(`<span class="badge bg-dark me-1">Status: ${fInvStatus}</span>`);
-    if (fMinAmt!==null) activeTags.push(`<span class="badge bg-danger me-1">Min: Ksh ${fMinAmt}</span>`);
-    if (fMaxAmt!==null) activeTags.push(`<span class="badge bg-danger me-1">Max: Ksh ${fMaxAmt}</span>`);
-    if (fSearch) activeTags.push(`<span class="badge bg-dark me-1">Keyword: "${escapeHtml(fSearch)}"</span>`);
-    const hasFilters = activeTags.length > 0;
-
-    // Build category options for filter dropdowns
-    const matCatOpts = _reportMatCatList.map(c=>`<option value="${escapeHtml(c.name)}" ${fMatCat===c.name?'selected':''}>${escapeHtml(c.name)}</option>`).join('');
-    const expCatOpts = _reportExpCatList.map(c=>`<option value="${escapeHtml(c.name)}" ${fExpCat===c.name?'selected':''}>${escapeHtml(c.name)}</option>`).join('');
+    const matCatOpts = _reportMatCatList.map(c=>`<option value="${escapeHtml(c.name)}">${escapeHtml(c.name)}</option>`).join('');
+    const expCatOpts = _reportExpCatList.map(c=>`<option value="${escapeHtml(c.name)}">${escapeHtml(c.name)}</option>`).join('');
 
     document.getElementById('pageContent').innerHTML = `
         <div class="p-4 rounded-3 text-white mb-4" style="background:linear-gradient(135deg,#1d6fea,#0f172a)">
             <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
-                <div>
-                    <h4 class="mb-1"><i class="fas fa-chart-line me-2"></i>Reports Dashboard</h4>
-                    <p class="mb-0 opacity-75">Comprehensive view of materials, expenses, inventory, and employee data</p>
-                </div>
-                <div class="d-flex gap-2 flex-wrap">
-                    <button class="btn btn-light btn-sm" onclick="printReport()"><i class="fas fa-print me-1"></i>Print</button>
-                    <button class="btn btn-warning btn-sm" onclick="saveReportPDF()"><i class="fas fa-file-pdf me-1"></i>Save PDF</button>
-                    <button class="btn btn-success btn-sm" onclick="showEmailModal()"><i class="fas fa-envelope me-1"></i>Schedule Email</button>
-                </div>
+                <div><h4 class="mb-1"><i class="fas fa-chart-line me-2"></i>Reports Dashboard</h4><p class="mb-0 opacity-75">Comprehensive view of materials, expenses, inventory, and employee data</p></div>
+                <div class="d-flex gap-2 flex-wrap"><button class="btn btn-light btn-sm" onclick="printReport()"><i class="fas fa-print me-1"></i>Print</button><button class="btn btn-warning btn-sm" onclick="saveReportPDF()"><i class="fas fa-file-pdf me-1"></i>Save PDF</button><button class="btn btn-success btn-sm" onclick="showEmailModal()"><i class="fas fa-envelope me-1"></i>Schedule Email</button></div>
             </div>
         </div>
-
         <div class="row g-3 mb-4">
             <div class="col-md-2 col-6"><div class="info-card ic-green"><div><div class="card-label">Total Spent</div><div class="card-value">Ksh ${fmt(totalMat+totalExp)}</div></div><i class="fas fa-wallet card-icon"></i></div></div>
             <div class="col-md-2 col-6"><div class="info-card ic-blue"><div><div class="card-label">Materials</div><div class="card-value">Ksh ${fmt(totalMat)}</div></div><i class="fas fa-cubes card-icon"></i></div></div>
@@ -1322,327 +1076,135 @@ async function renderReports(filters) {
             <div class="col-md-2 col-6"><div class="info-card ic-cyan"><div><div class="card-label">Wages Paid</div><div class="card-value">Ksh ${fmt(wagesPaid)}</div></div><i class="fas fa-users card-icon"></i></div></div>
             <div class="col-md-2 col-6"><div class="info-card ic-dark"><div><div class="card-label">Top Site</div><div class="card-value" style="font-size:1rem">${escapeHtml(Object.keys(matBySite)[0]||'N/A')}</div></div><i class="fas fa-map-marker-alt card-icon"></i></div></div>
         </div>
-
-        <!-- ENHANCED FILTER BAR -->
-        <div class="filter-bar mb-4 ${hasFilters?'border border-2 border-primary':''}">
-            <div class="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
-                <div class="d-flex align-items-center gap-2">
-                    <i class="fas fa-filter text-primary"></i>
-                    <strong>Search &amp; Filters</strong>
-                    ${hasFilters ? '<span class="badge bg-primary">Active</span>' : ''}
-                </div>
-                ${hasFilters ? `<div>${activeTags.join('')}<button class="btn btn-outline-danger btn-sm ms-2" onclick="renderReports()"><i class="fas fa-times me-1"></i>Clear All</button></div>` : ''}
-            </div>
-
-            <!-- Row 1: Type, Site, Dates -->
+        <div class="filter-bar mb-4">
+            <div class="d-flex align-items-center mb-3"><i class="fas fa-filter text-primary me-2"></i><strong>Search & Filters</strong></div>
             <div class="row g-2 mb-2">
-                <div class="col-md-3 col-6">
-                    <label class="form-label small fw-bold">Data Type</label>
-                    <select id="reportType" class="form-select form-select-sm">
-                        <option value="all" ${fType==='all'?'selected':''}>All Data</option>
-                        <option value="materials" ${fType==='materials'?'selected':''}>Materials Only</option>
-                        <option value="expenses" ${fType==='expenses'?'selected':''}>Expenses Only</option>
-                        <option value="inventory" ${fType==='inventory'?'selected':''}>Inventory Only</option>
-                    </select>
-                </div>
-                <div class="col-md-3 col-6">
-                    <label class="form-label small fw-bold">Site</label>
-                    <select id="reportSite" class="form-select form-select-sm">
-                        <option value="all">All Sites</option>
-                        ${_reportSiteList.map(s=>`<option value="${escapeHtml(s.name)}" ${fSite===s.name?'selected':''}>${escapeHtml(s.name)}</option>`).join('')}
-                    </select>
-                </div>
-                <div class="col-md-3 col-6">
-                    <label class="form-label small fw-bold">Date From</label>
-                    <input type="date" id="reportDateFrom" class="form-control form-control-sm" value="${fFrom}">
-                </div>
-                <div class="col-md-3 col-6">
-                    <label class="form-label small fw-bold">Date To</label>
-                    <input type="date" id="reportDateTo" class="form-control form-control-sm" value="${fTo}">
-                </div>
+                <div class="col-md-3"><label class="form-label small fw-bold">Data Type</label><select id="reportType" class="form-select form-select-sm"><option value="all">All Data</option><option value="materials">Materials Only</option><option value="expenses">Expenses Only</option><option value="inventory">Inventory Only</option></select></div>
+                <div class="col-md-3"><label class="form-label small fw-bold">Site</label><select id="reportSite" class="form-select form-select-sm"><option value="all">All Sites</option>${_reportSiteList.map(s=>`<option value="${escapeHtml(s.name)}">${escapeHtml(s.name)}</option>`).join('')}</select></div>
+                <div class="col-md-3"><label class="form-label small fw-bold">Date From</label><input type="date" id="reportDateFrom" class="form-control form-control-sm"></div>
+                <div class="col-md-3"><label class="form-label small fw-bold">Date To</label><input type="date" id="reportDateTo" class="form-control form-control-sm"></div>
             </div>
-
-            <!-- Row 2: Category filters + supplier + inv status -->
             <div class="row g-2 mb-2">
-                <div class="col-md-3 col-6">
-                    <label class="form-label small fw-bold"><i class="fas fa-cubes me-1 text-primary"></i>Material Category</label>
-                    <select id="reportMatCat" class="form-select form-select-sm">
-                        <option value="all">All Material Categories</option>
-                        ${matCatOpts}
-                    </select>
-                </div>
-                <div class="col-md-3 col-6">
-                    <label class="form-label small fw-bold"><i class="fas fa-receipt me-1 text-warning"></i>Expense Category</label>
-                    <select id="reportExpCat" class="form-select form-select-sm">
-                        <option value="all">All Expense Categories</option>
-                        ${expCatOpts}
-                    </select>
-                </div>
-                <div class="col-md-3 col-6">
-                    <label class="form-label small fw-bold"><i class="fas fa-truck me-1 text-success"></i>Supplier</label>
-                    <input type="text" id="reportSupplier" class="form-control form-control-sm" placeholder="Filter by supplier..." value="${escapeHtml(fSupplier)}">
-                </div>
-                <div class="col-md-3 col-6">
-                    <label class="form-label small fw-bold"><i class="fas fa-boxes me-1 text-info"></i>Inventory Status</label>
-                    <select id="reportInvStatus" class="form-select form-select-sm">
-                        <option value="all" ${fInvStatus==='all'?'selected':''}>All Statuses</option>
-                        <option value="available" ${fInvStatus==='available'?'selected':''}>Available</option>
-                        <option value="transferred" ${fInvStatus==='transferred'?'selected':''}>Transferred</option>
-                        <option value="damaged" ${fInvStatus==='damaged'?'selected':''}>Damaged</option>
-                        <option value="lost" ${fInvStatus==='lost'?'selected':''}>Lost</option>
-                    </select>
-                </div>
+                <div class="col-md-3"><label class="form-label small fw-bold">Material Category</label><select id="reportMatCat" class="form-select form-select-sm"><option value="all">All Categories</option>${matCatOpts}</select></div>
+                <div class="col-md-3"><label class="form-label small fw-bold">Expense Category</label><select id="reportExpCat" class="form-select form-select-sm"><option value="all">All Categories</option>${expCatOpts}</select></div>
+                <div class="col-md-3"><label class="form-label small fw-bold">Supplier</label><input type="text" id="reportSupplier" class="form-control form-control-sm" placeholder="Filter by supplier"></div>
+                <div class="col-md-3"><label class="form-label small fw-bold">Inventory Status</label><select id="reportInvStatus" class="form-select form-select-sm"><option value="all">All Statuses</option><option value="available">Available</option><option value="transferred">Transferred</option><option value="damaged">Damaged</option><option value="lost">Lost</option></select></div>
             </div>
-
-            <!-- Row 3: Amount range + keyword search + buttons -->
             <div class="row g-2">
-                <div class="col-md-2 col-6">
-                    <label class="form-label small fw-bold">Min Amount (Ksh)</label>
-                    <input type="number" id="reportMinAmt" class="form-control form-control-sm" placeholder="0" value="${fMinAmt??''}">
-                </div>
-                <div class="col-md-2 col-6">
-                    <label class="form-label small fw-bold">Max Amount (Ksh)</label>
-                    <input type="number" id="reportMaxAmt" class="form-control form-control-sm" placeholder="Any" value="${fMaxAmt??''}">
-                </div>
-                <div class="col-md-5">
-                    <label class="form-label small fw-bold">Keyword Search</label>
-                    <div class="input-group input-group-sm">
-                        <span class="input-group-text"><i class="fas fa-search"></i></span>
-                        <input type="text" id="reportSearch" class="form-control" placeholder="Material name, description, serial, notes..." value="${escapeHtml(fSearch)}">
-                    </div>
-                </div>
-                <div class="col-md-3 d-flex align-items-end gap-1">
-                    <button class="btn btn-primary btn-sm flex-grow-1" onclick="applyReportFilters()"><i class="fas fa-search me-1"></i>Apply</button>
-                    <button class="btn btn-outline-secondary btn-sm" onclick="renderReports()" title="Clear all filters"><i class="fas fa-times"></i></button>
-                </div>
+                <div class="col-md-2"><label class="form-label small fw-bold">Min Amount</label><input type="number" id="reportMinAmt" class="form-control form-control-sm" placeholder="0"></div>
+                <div class="col-md-2"><label class="form-label small fw-bold">Max Amount</label><input type="number" id="reportMaxAmt" class="form-control form-control-sm" placeholder="Any"></div>
+                <div class="col-md-5"><label class="form-label small fw-bold">Keyword Search</label><div class="input-group input-group-sm"><span class="input-group-text"><i class="fas fa-search"></i></span><input type="text" id="reportSearch" class="form-control" placeholder="Material name, description, serial, notes..."></div></div>
+                <div class="col-md-3 d-flex align-items-end gap-1"><button class="btn btn-primary btn-sm flex-grow-1" onclick="applyReportFilters()"><i class="fas fa-search me-1"></i>Apply</button><button class="btn btn-outline-secondary btn-sm" onclick="renderReports()"><i class="fas fa-times"></i> Clear</button></div>
             </div>
-
-            <!-- Results summary -->
-            ${hasFilters ? `<div class="mt-3 p-2 rounded" style="background:#f0f7ff;font-size:12px;color:#555">
-                <i class="fas fa-info-circle me-1 text-primary"></i>
-                Showing <strong>${mData.length}</strong> material record(s) totalling <strong>Ksh ${fmt(totalMat)}</strong> &nbsp;|&nbsp;
-                <strong>${eData.length}</strong> expense record(s) totalling <strong>Ksh ${fmt(totalExp)}</strong> &nbsp;|&nbsp;
-                <strong>${iData.length}</strong> inventory item(s)
-            </div>` : `<div class="mt-2 text-muted small"><i class="fas fa-info-circle me-1"></i>Showing all data. Use filters above to narrow results.</div>`}
         </div>
-
-        <!-- PDF PRINTABLE AREA -->
         <div id="reportPrintArea">
-            <!-- SITE BREAKDOWN -->
-            <div class="card mb-4">
-                <div class="card-header bg-secondary text-white"><h6 class="mb-0">Cost Breakdown by Site</h6></div>
-                <div class="card-body p-0"><div class="table-responsive"><table class="table table-bordered mb-0">
-                    <thead class="table-primary"><tr><th>#</th><th>Site</th><th>Materials Total</th><th>Expenses Total</th><th>Grand Total</th></tr></thead>
-                    <tbody>${siteRows||'<tr><td colspan="5" class="text-center text-muted">No data</td></tr>'}</tbody>
-                </table></div></div>
-            </div>
-
-            <!-- MATERIALS DETAIL TABLE -->
-            ${showMat ? `<div class="card mb-4">
-                <div class="card-header bg-primary text-white">
-                    <h6 class="mb-0"><i class="fas fa-cubes me-2"></i>Materials Detail &nbsp;<span class="badge bg-light text-dark">${mData.length} records</span> &nbsp;<span class="badge bg-warning text-dark">Ksh ${fmt(totalMat)}</span></h6>
-                </div>
-                <div class="card-body p-0"><div class="table-responsive"><table class="table table-bordered table-hover mb-0" style="font-size:13px">
-                    <thead class="table-primary"><tr><th>#</th><th>Site</th><th>Material</th><th>Category</th><th>Quantity</th><th>Unit Cost</th><th>Total Cost</th><th>Date</th><th>Supplier</th></tr></thead>
-                    <tbody>${matRows||'<tr><td colspan="9" class="text-center text-muted">No records match your filters</td></tr>'}</tbody>
-                    <tfoot><tr class="table-secondary fw-bold"><td colspan="6" class="text-end">Total:</td><td colspan="3">Ksh ${fmt(totalMat)}</td></tr></tfoot>
-                </table></div></div>
-            </div>` : ''}
-
-            <!-- EXPENSES DETAIL TABLE -->
-            ${showExp ? `<div class="card mb-4">
-                <div class="card-header bg-warning text-dark">
-                    <h6 class="mb-0"><i class="fas fa-receipt me-2"></i>Expenses Detail &nbsp;<span class="badge bg-dark text-white">${eData.length} records</span> &nbsp;<span class="badge bg-danger">Ksh ${fmt(totalExp)}</span></h6>
-                </div>
-                <div class="card-body p-0"><div class="table-responsive"><table class="table table-bordered table-hover mb-0" style="font-size:13px">
-                    <thead class="table-primary"><tr><th>#</th><th>Site</th><th>Category</th><th>Description</th><th>Amount</th><th>Date</th><th>Receipt No.</th></tr></thead>
-                    <tbody>${expRows||'<tr><td colspan="7" class="text-center text-muted">No records match your filters</td></tr>'}</tbody>
-                    <tfoot><tr class="table-secondary fw-bold"><td colspan="4" class="text-end">Total:</td><td colspan="3">Ksh ${fmt(totalExp)}</td></tr></tfoot>
-                </table></div></div>
-            </div>` : ''}
-
-            <!-- INVENTORY DETAIL TABLE -->
-            ${showInv ? `<div class="card mb-4">
-                <div class="card-header bg-info text-white">
-                    <h6 class="mb-0"><i class="fas fa-boxes me-2"></i>Inventory Detail &nbsp;<span class="badge bg-light text-dark">${iData.length} items</span></h6>
-                </div>
-                <div class="card-body p-0"><div class="table-responsive"><table class="table table-bordered table-hover mb-0" style="font-size:13px">
-                    <thead class="table-primary"><tr><th>#</th><th>Item</th><th>Category</th><th>Serial</th><th>Site</th><th>Qty</th><th>Status</th><th>Cost</th><th>Date</th></tr></thead>
-                    <tbody>${invRows||'<tr><td colspan="9" class="text-center text-muted">No records match your filters</td></tr>'}</tbody>
-                </table></div></div>
-            </div>` : ''}
-
-            <!-- CHARTS -->
-            <div class="row g-3 mb-4">
-                <div class="col-md-6"><div class="card"><div class="card-header bg-primary text-white"><h6 class="mb-0">Top 5 Materials by Cost</h6></div><div class="card-body"><canvas id="topMaterialsChart" height="250"></canvas></div></div></div>
-                <div class="col-md-6"><div class="card"><div class="card-header bg-success text-white"><h6 class="mb-0">Expenses by Category</h6></div><div class="card-body"><canvas id="expensesChart" height="250"></canvas></div></div></div>
-            </div>
+            <div class="card mb-4"><div class="card-header bg-secondary text-white"><h6 class="mb-0">Cost Breakdown by Site</h6></div><div class="card-body p-0"><div class="table-responsive"><table class="table table-bordered mb-0"><thead class="table-primary"><tr><th>#</th><th>Site</th><th>Materials Total</th><th>Expenses Total</th><th>Grand Total</th></tr></thead><tbody>${siteRows||'<tr><td colspan="5" class="text-center text-muted">No data</td></tr>'}</tbody></table></div></div></div>
+            ${showMat ? `<div class="card mb-4"><div class="card-header bg-primary text-white"><h6 class="mb-0"><i class="fas fa-cubes me-2"></i>Materials Detail (${mData.length} records, Ksh ${fmt(totalMat)})</h6></div><div class="card-body p-0"><div class="table-responsive"><table class="table table-bordered table-hover mb-0" style="font-size:13px"><thead class="table-primary"><tr><th>#</th><th>Site</th><th>Material</th><th>Category</th><th>Quantity</th><th>Unit Cost</th><th>Total Cost</th><th>Date</th><th>Supplier</th></tr></thead><tbody>${matRows||'<tr><td colspan="9" class="text-center text-muted">No records</td></tr>'}</tbody><tfoot><tr class="table-secondary fw-bold"><td colspan="6" class="text-end">Total:</td><td colspan="3">Ksh ${fmt(totalMat)}</td></tr></tfoot></table></div></div></div>` : ''}
+            ${showExp ? `<div class="card mb-4"><div class="card-header bg-warning text-dark"><h6 class="mb-0"><i class="fas fa-receipt me-2"></i>Expenses Detail (${eData.length} records, Ksh ${fmt(totalExp)})</h6></div><div class="card-body p-0"><div class="table-responsive"><table class="table table-bordered table-hover mb-0" style="font-size:13px"><thead class="table-primary"><tr><th>#</th><th>Site</th><th>Category</th><th>Description</th><th>Amount</th><th>Date</th><th>Receipt No.</th></tr></thead><tbody>${expRows||'<td><td colspan="7" class="text-center text-muted">No records</td></tr>'}</tbody><tfoot><tr class="table-secondary fw-bold"><td colspan="4" class="text-end">Total:</td><td colspan="3">Ksh ${fmt(totalExp)}</td></tr></tfoot></table></div></div></div>` : ''}
+            ${showInv ? `<div class="card mb-4"><div class="card-header bg-info text-white"><h6 class="mb-0"><i class="fas fa-boxes me-2"></i>Inventory Detail (${iData.length} items)</h6></div><div class="card-body p-0"><div class="table-responsive"><table class="table table-bordered table-hover mb-0" style="font-size:13px"><thead class="table-primary"><tr><th>#</th><th>Item</th><th>Category</th><th>Serial</th><th>Site</th><th>Qty</th><th>Status</th><th>Cost</th><th>Date</th></tr></thead><tbody>${invRows||'<tr><td colspan="9" class="text-center text-muted">No records</td></tr>'}</tbody></table></div></div></div>` : ''}
+            <div class="row g-3 mb-4"><div class="col-md-6"><div class="card"><div class="card-header bg-primary text-white"><h6 class="mb-0">Top 5 Materials by Cost</h6></div><div class="card-body"><canvas id="topMaterialsChart" height="250"></canvas></div></div></div><div class="col-md-6"><div class="card"><div class="card-header bg-success text-white"><h6 class="mb-0">Expenses by Category</h6></div><div class="card-body"><canvas id="expensesChart" height="250"></canvas></div></div></div></div>
             <div class="card mb-4"><div class="card-header bg-info text-white"><h6 class="mb-0">Materials Cost by Site</h6></div><div class="card-body"><canvas id="sitesChart" height="180"></canvas></div></div>
         </div>
+        <div class="modal fade" id="emailReportModal" tabindex="-1"><div class="modal-dialog"><div class="modal-content"><div class="modal-header bg-success text-white"><h5 class="modal-title"><i class="fas fa-envelope me-2"></i>Schedule Daily Report Email</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="alert alert-info small">Set a daily time to receive a PDF report by email.</div><div class="mb-3"><label class="form-label fw-bold">Recipient Email</label><input type="email" id="emailRecipient" class="form-control" value="${currentUser?.email||''}"></div><div class="mb-3"><label class="form-label fw-bold">Send Time (daily)</label><input type="time" id="emailSendTime" class="form-control" value="07:00"></div><div class="mb-3"><label class="form-label fw-bold">Report Scope</label><select id="emailScope" class="form-select"><option value="all">Full Report</option><option value="materials">Materials only</option><option value="expenses">Expenses only</option><option value="inventory">Inventory only</option></select></div><div id="emailScheduleStatus"></div></div><div class="modal-footer"><button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button><button class="btn btn-danger btn-sm me-auto" onclick="clearEmailSchedule()">Clear Schedule</button><button class="btn btn-success" onclick="saveEmailSchedule()">Save Schedule</button></div></div></div></div>`;
 
-        <!-- EMAIL SCHEDULER MODAL -->
-        <div class="modal fade" id="emailReportModal" tabindex="-1"><div class="modal-dialog"><div class="modal-content">
-            <div class="modal-header bg-success text-white"><h5 class="modal-title"><i class="fas fa-envelope me-2"></i>Schedule Daily Report Email</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div>
-            <div class="modal-body">
-                <div class="alert alert-info small"><i class="fas fa-info-circle me-1"></i>Set a daily time to receive a PDF report by email. Keep this browser tab open for the schedule to trigger automatically.</div>
-                <div class="mb-3"><label class="form-label fw-bold">Recipient Email</label><input type="email" id="emailRecipient" class="form-control" value="${currentUser?.email||''}" placeholder="email@example.com"></div>
-                <div class="mb-3"><label class="form-label fw-bold">Send Time (daily)</label><input type="time" id="emailSendTime" class="form-control" value="07:00"></div>
-                <div class="mb-3"><label class="form-label fw-bold">Report Scope</label>
-                    <select id="emailScope" class="form-select">
-                        <option value="all">Full Report (all data)</option>
-                        <option value="materials">Materials only</option>
-                        <option value="expenses">Expenses only</option>
-                        <option value="inventory">Inventory only</option>
-                    </select>
-                </div>
-                <div id="emailScheduleStatus" class="mt-2"></div>
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button class="btn btn-danger btn-sm me-auto" onclick="clearEmailSchedule()"><i class="fas fa-trash me-1"></i>Clear Schedule</button>
-                <button class="btn btn-success" onclick="saveEmailSchedule()"><i class="fas fa-save me-1"></i>Save Schedule</button>
-            </div>
-        </div></div></div>`;
-
-    // Charts
-    if (topMaterials.length) {
-        new Chart(document.getElementById('topMaterialsChart'), { type:'bar', data:{ labels:topMaterials.map(m=>m.material_name), datasets:[{label:'Cost (Ksh)', data:topMaterials.map(m=>m.total_cost||0), backgroundColor:'rgba(54,162,235,0.7)'}] }, options:{responsive:true,plugins:{legend:{display:false}}} });
-    }
-    if (Object.keys(expByCat).length) {
-        new Chart(document.getElementById('expensesChart'), { type:'pie', data:{ labels:Object.keys(expByCat), datasets:[{data:Object.values(expByCat), backgroundColor:['#36a2eb','#ffcd56','#ff6384','#4bc0c0','#9966ff','#ff9f40']}] }, options:{responsive:true} });
-    }
-    if (Object.keys(matBySite).length) {
-        new Chart(document.getElementById('sitesChart'), { type:'bar', data:{ labels:Object.keys(matBySite), datasets:[{label:'Materials Cost (Ksh)', data:Object.values(matBySite), backgroundColor:'rgba(75,192,192,0.7)'}] }, options:{responsive:true,plugins:{legend:{display:false}}} });
-    }
-
-    loadEmailScheduleStatus();
-    checkEmailSchedule();
+    if (topMaterials.length) { new Chart(document.getElementById('topMaterialsChart'), { type:'bar', data:{ labels:topMaterials.map(m=>m.material_name), datasets:[{label:'Cost (Ksh)', data:topMaterials.map(m=>m.total_cost||0), backgroundColor:'rgba(54,162,235,0.7)'}] }, options:{responsive:true,plugins:{legend:{display:false}}} }); }
+    if (Object.keys(expByCat).length) { new Chart(document.getElementById('expensesChart'), { type:'pie', data:{ labels:Object.keys(expByCat), datasets:[{data:Object.values(expByCat), backgroundColor:['#36a2eb','#ffcd56','#ff6384','#4bc0c0','#9966ff','#ff9f40']}] }, options:{responsive:true} }); }
+    if (Object.keys(matBySite).length) { new Chart(document.getElementById('sitesChart'), { type:'bar', data:{ labels:Object.keys(matBySite), datasets:[{label:'Materials Cost (Ksh)', data:Object.values(matBySite), backgroundColor:'rgba(75,192,192,0.7)'}] }, options:{responsive:true,plugins:{legend:{display:false}}} }); }
+    loadEmailScheduleStatus(); checkEmailSchedule();
 }
 
 function applyReportFilters() {
-    const filters = {
-        type:      document.getElementById('reportType')?.value      || 'all',
-        site:      document.getElementById('reportSite')?.value      || 'all',
-        from:      document.getElementById('reportDateFrom')?.value   || '',
-        to:        document.getElementById('reportDateTo')?.value     || '',
-        search:    document.getElementById('reportSearch')?.value     || '',
-        matCat:    document.getElementById('reportMatCat')?.value     || 'all',
-        expCat:    document.getElementById('reportExpCat')?.value     || 'all',
-        supplier:  document.getElementById('reportSupplier')?.value   || '',
-        invStatus: document.getElementById('reportInvStatus')?.value  || 'all',
-        minAmt:    document.getElementById('reportMinAmt')?.value     || '',
-        maxAmt:    document.getElementById('reportMaxAmt')?.value     || ''
-    };
-    renderReports(filters);
+    renderReports({
+        type: document.getElementById('reportType')?.value || 'all',
+        site: document.getElementById('reportSite')?.value || 'all',
+        from: document.getElementById('reportDateFrom')?.value || '',
+        to: document.getElementById('reportDateTo')?.value || '',
+        search: document.getElementById('reportSearch')?.value || '',
+        matCat: document.getElementById('reportMatCat')?.value || 'all',
+        expCat: document.getElementById('reportExpCat')?.value || 'all',
+        supplier: document.getElementById('reportSupplier')?.value || '',
+        invStatus: document.getElementById('reportInvStatus')?.value || 'all',
+        minAmt: document.getElementById('reportMinAmt')?.value || '',
+        maxAmt: document.getElementById('reportMaxAmt')?.value || ''
+    });
 }
 
-// ---- PDF & PRINT ----
 function saveReportPDF() {
     const element = document.getElementById('reportPrintArea');
-    const opt = {
-        margin: [0.4, 0.4, 0.4, 0.4],
-        filename: `Platinum_Construction_Report_${new Date().toISOString().slice(0,10)}.pdf`,
-        image: { type: 'jpeg', quality: 0.97 },
-        html2canvas: { scale: 2, useCORS: true },
-        jsPDF: { unit: 'in', format: 'a4', orientation: 'landscape' }
-    };
-    html2pdf().set(opt).from(element).save();
+    html2pdf().set({ margin: [0.4,0.4,0.4,0.4], filename: `Platinum_Report_${new Date().toISOString().slice(0,10)}.pdf`, image: { type: 'jpeg', quality: 0.97 }, html2canvas: { scale: 2 }, jsPDF: { unit: 'in', format: 'a4', orientation: 'landscape' } }).from(element).save();
 }
 
 function printReport() {
     const content = document.getElementById('reportPrintArea').innerHTML;
     const win = window.open('', '_blank');
-    win.document.write(`<!DOCTYPE html><html><head>
-        <title>Platinum Construction Report — ${new Date().toLocaleDateString()}</title>
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-        <style>
-            body { font-family: 'Segoe UI', sans-serif; padding: 20px; font-size: 12px; }
-            .info-card { display:none; }
-            @media print { button { display:none; } }
-            .card { margin-bottom: 16px; }
-            thead { background: #0d6efd; color: white; }
-        </style>
-    </head><body>
-        <div style="background:linear-gradient(135deg,#1d6fea,#0f172a);color:white;padding:16px;border-radius:8px;margin-bottom:20px">
-            <h4 style="margin:0">Platinum Construction LTD — Report</h4>
-            <small>Generated: ${new Date().toLocaleString()}</small>
-        </div>
-        ${content}
-        <script>window.onload=()=>{ window.print(); window.close(); }<\/script>
-    </body></html>`);
+    win.document.write(`<!DOCTYPE html><html><head><title>Platinum Construction Report</title><link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"><style>body{padding:20px;font-size:12px;} @media print{button{display:none;}}</style></head><body><div style="background:linear-gradient(135deg,#1d6fea,#0f172a);color:white;padding:16px;margin-bottom:20px"><h4>Platinum Construction LTD Report</h4><small>${new Date().toLocaleString()}</small></div>${content}<script>window.onload=()=>{window.print();window.close();}<\/script></body></html>`);
     win.document.close();
 }
 
-// ---- EMAIL SCHEDULER (localStorage-based daily trigger) ----
-function showEmailModal() {
-    loadEmailScheduleStatus();
-    new bootstrap.Modal(document.getElementById('emailReportModal')).show();
+function showEmailModal() { loadEmailScheduleStatus(); new bootstrap.Modal(document.getElementById('emailReportModal')).show(); }
+function saveEmailSchedule() { const recipient = document.getElementById('emailRecipient').value.trim(); const time = document.getElementById('emailSendTime').value; if (!recipient || !time) { alert('Please fill in email and time'); return; } localStorage.setItem('platinumReportSchedule', JSON.stringify({ recipient, time, enabled: true })); loadEmailScheduleStatus(); bootstrap.Modal.getInstance(document.getElementById('emailReportModal')).hide(); alert('Daily report scheduled!'); }
+function clearEmailSchedule() { localStorage.removeItem('platinumReportSchedule'); localStorage.removeItem('platinumReportLastSent'); loadEmailScheduleStatus(); alert('Schedule cleared.'); }
+function loadEmailScheduleStatus() { const sched = JSON.parse(localStorage.getItem('platinumReportSchedule') || 'null'); const statusEl = document.getElementById('emailScheduleStatus'); if (statusEl) statusEl.innerHTML = sched ? `<div class="alert alert-success small">Active: Daily at ${sched.time} → ${sched.recipient}</div>` : `<div class="alert alert-secondary small">No schedule active.</div>`; }
+function checkEmailSchedule() { const sched = JSON.parse(localStorage.getItem('platinumReportSchedule') || 'null'); if (!sched) return; const now = new Date(); const [hh, mm] = sched.time.split(':').map(Number); const todayKey = now.toISOString().slice(0,10); if (now.getHours() === hh && now.getMinutes() === mm && localStorage.getItem('platinumReportLastSent') !== todayKey) { localStorage.setItem('platinumReportLastSent', todayKey); alert('Daily report time! Generating PDF...'); saveReportPDF(); } setTimeout(checkEmailSchedule, 30000); }
+
+// ============= ADMIN PANEL =============
+async function showAdminPanel() {
+    if (!isAdmin()) { alert('Access denied'); return; }
+    const { data: users } = await supabaseClient.from('profiles').select('*, sites(name)');
+    const { data: sites } = await supabaseClient.from('sites').select('id, name');
+    let userRows = '';
+    (users || []).forEach(u => {
+        userRows += `<tr>
+            <td>${escapeHtml(u.email)}</td><td>${escapeHtml(u.full_name || '-')}</td>
+            <td><select id="role_${u.id}" class="form-select form-select-sm" onchange="updateUserRole('${u.id}', this.value)">
+                <option value="site_manager" ${u.role === 'site_manager' ? 'selected' : ''}>Site Manager</option>
+                <option value="admin" ${u.role === 'admin' ? 'selected' : ''}>Admin</option>
+            </select></td>
+            <td><select id="site_${u.id}" class="form-select form-select-sm" onchange="updateUserSite('${u.id}', this.value)">
+                <option value="">No Site Assigned</option>
+                ${(sites||[]).map(s => `<option value="${s.id}" ${u.assigned_site_id === s.id ? 'selected' : ''}>${escapeHtml(s.name)}</option>`).join('')}
+            </select></td>
+        </tr>`;
+    });
+    document.getElementById('pageContent').innerHTML = `
+        <div class="card"><div class="card-header bg-primary text-white"><h5 class="mb-0"><i class="fas fa-users-cog me-2"></i>User Management</h5></div>
+        <div class="card-body"><div class="table-responsive"><table class="table table-bordered"><thead class="table-primary"><tr><th>Email</th><th>Name</th><th>Role</th><th>Assigned Site</th></tr></thead><tbody>${userRows}</tbody></table></div>
+        <div class="alert alert-info mt-3"><i class="fas fa-info-circle me-2"></i><strong>Registration Password:</strong> Set in database table <code>app_settings</code> with key 'registration_password'<br>
+        <strong>Current Users:</strong> ${(users||[]).length} total users | ${(users||[]).filter(u=>u.role==='admin').length} Admins | ${(users||[]).filter(u=>u.role==='site_manager').length} Site Managers</div></div></div>`;
 }
 
-function saveEmailSchedule() {
-    const recipient = document.getElementById('emailRecipient').value.trim();
-    const time      = document.getElementById('emailSendTime').value;
-    const scope     = document.getElementById('emailScope').value;
-    if (!recipient || !time) { alert('Please fill in email and time'); return; }
-    const schedule = { recipient, time, scope, enabled: true, savedAt: new Date().toISOString() };
-    localStorage.setItem('platinumReportSchedule', JSON.stringify(schedule));
-    loadEmailScheduleStatus();
-    bootstrap.Modal.getInstance(document.getElementById('emailReportModal')).hide();
-    alert(`✅ Daily report scheduled for ${time} → ${recipient}\n\nNote: Keep this browser tab open for the schedule to fire. For production use, configure a Supabase Edge Function or email service.`);
+async function updateUserRole(userId, role) {
+    await supabaseClient.from('profiles').update({ role }).eq('id', userId);
+    alert('Role updated successfully');
 }
 
-function clearEmailSchedule() {
-    localStorage.removeItem('platinumReportSchedule');
-    localStorage.removeItem('platinumReportLastSent');
-    loadEmailScheduleStatus();
-    alert('Schedule cleared.');
+async function updateUserSite(userId, siteId) {
+    await supabaseClient.from('profiles').update({ assigned_site_id: siteId || null }).eq('id', userId);
+    alert('Site assignment updated');
 }
 
-function loadEmailScheduleStatus() {
-    const statusEl = document.getElementById('emailScheduleStatus');
-    if (!statusEl) return;
-    const sched = JSON.parse(localStorage.getItem('platinumReportSchedule') || 'null');
-    const lastSent = localStorage.getItem('platinumReportLastSent');
-    if (sched && sched.enabled) {
-        statusEl.innerHTML = `<div class="alert alert-success small mb-0">
-            <i class="fas fa-check-circle me-1"></i>
-            <strong>Active schedule:</strong> Daily at <strong>${sched.time}</strong> → <strong>${sched.recipient}</strong> (${sched.scope})
-            ${lastSent ? `<br><small>Last sent: ${lastSent}</small>` : ''}
-        </div>`;
-    } else {
-        statusEl.innerHTML = `<div class="alert alert-secondary small mb-0"><i class="fas fa-clock me-1"></i>No schedule active.</div>`;
-    }
+// ============= UTILITY FUNCTIONS =============
+function showProfile() { 
+    alert(`User: ${currentUser?.email}\nRole: ${currentUserProfile?.role}\nAssigned Site ID: ${currentUserProfile?.assigned_site_id || 'None'}\nFull Name: ${currentUserProfile?.full_name || 'Not set'}`);
 }
 
-function checkEmailSchedule() {
-    const sched = JSON.parse(localStorage.getItem('platinumReportSchedule') || 'null');
-    if (!sched || !sched.enabled) return;
-    const now = new Date();
-    const [hh, mm] = sched.time.split(':').map(Number);
-    const todayKey = now.toISOString().slice(0,10);
-    const lastSentKey = localStorage.getItem('platinumReportLastSent') || '';
-    const shouldSend = now.getHours() === hh && now.getMinutes() === mm && lastSentKey !== todayKey;
-    if (shouldSend) {
-        localStorage.setItem('platinumReportLastSent', todayKey);
-        // Generate and "send" — opens mailto with PDF download prompt
-        alert(`📧 Daily report time! Generating PDF for ${sched.recipient}...\n\nThe PDF will download now. Attach it to an email to ${sched.recipient}.\n\nFor fully automated email delivery, configure a Supabase Edge Function with an email provider (e.g. Resend, SendGrid).`);
-        saveReportPDF();
-        // Open mailto as a helper
-        const subject = encodeURIComponent(`Platinum Construction Daily Report — ${todayKey}`);
-        const body = encodeURIComponent(`Please find attached the daily construction report for ${todayKey}.\n\nGenerated by Platinum Construction Management System.`);
-        window.location.href = `mailto:${sched.recipient}?subject=${subject}&body=${body}`;
-    }
-    // Check again in 30 seconds
-    setTimeout(checkEmailSchedule, 30000);
+function showSettings() { 
+    alert('Settings - Coming soon in next version.\n\nFeatures planned:\n- Email notification preferences\n- Report customization\n- Currency settings\n- Date format settings');
 }
 
-// ============= UTILITY =============
-function showProfile()  { alert(`User: ${currentUser?.email}`); }
-function showSettings() { alert('Settings - coming soon'); }
-function showAbout()    { alert('Platinum Construction Management v4.0\nDeveloped by AVC Tech\n© 2025'); }
-function showPrivacy()  { alert('Privacy Policy - Data is encrypted and secured.'); }
-function showTerms()    { alert('Terms of Service - 365 day free trial'); }
+function showAbout() { 
+    alert('Platinum Construction Management v5.0\n\nDeveloped by AVC Tech\n© 2025\n\nFeatures:\n- Role-Based Access Control\n- Real-time Dashboard\n- Material & Expense Tracking\n- Inventory Management\n- Employee Attendance & Payroll\n- Comprehensive Reporting\n- PDF Export & Email Scheduling\n\nContact: starjabu@gmail.com | +254 717 141 710');
+}
 
+function showPrivacy() { 
+    alert('Privacy Policy\n\nYour data is encrypted and secured using Supabase Row Level Security. We do not share your data with third parties. All data is backed up daily.');
+}
+
+function showTerms() { 
+    alert('Terms of Service\n\nThis software is provided for construction management purposes. Users are responsible for data accuracy. AVC Tech provides ongoing support and updates.');
+}
+
+// Initialize the application
 initApp();
 </script>
 </body>
